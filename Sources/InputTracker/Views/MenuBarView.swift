@@ -79,9 +79,14 @@ struct MenuBarView: View {
             Text("Input Monitoring Required")
                 .font(.headline)
 
-            Text("InputTracker needs permission to monitor keyboard and mouse events.")
+            Text("Tappy needs permission to monitor keyboard and mouse events.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+
+            Text("Updating? Remove the old Tappy from Input Monitoring, restart and grant access again.")
+                .font(.system(size: 9))
+                .foregroundStyle(.orange)
                 .multilineTextAlignment(.center)
 
             Button("Grant Permission") {
@@ -171,6 +176,20 @@ struct MenuBarView: View {
                 }
             }
             .buttonStyle(.borderless)
+
+            if updateChecker.updateAvailable, let urlString = updateChecker.updateURL,
+               let url = URL(string: urlString) {
+                Button {
+                    NSWorkspace.shared.open(url)
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "arrow.down.circle")
+                        Text("Download v\(updateChecker.latestVersion ?? "?")")
+                    }
+                    .foregroundStyle(.orange)
+                }
+                .buttonStyle(.borderless)
+            }
 
             Divider()
 

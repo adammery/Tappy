@@ -1,5 +1,4 @@
 import Foundation
-import CoreGraphics
 import AppKit
 import CryptoKit
 import Observation
@@ -12,7 +11,7 @@ struct ExportData: Codable {
 }
 
 private enum Crypto {
-    private static let keyData = Data("InputTracker!!v1".utf8)
+    private static let keyData = Data("Tappy!secret!!v1".utf8)
     private static var key: SymmetricKey { SymmetricKey(data: keyData) }
 
     static func encrypt(_ data: Data) throws -> Data {
@@ -38,8 +37,8 @@ final class StatsManager {
 
     private var saveTimer: Timer?
     private let defaults = UserDefaults.standard
-    private static let keyboardKey = "InputTracker.keyboard"
-    private static let mouseKey = "InputTracker.mouse"
+    private static let keyboardKey = "Tappy.keyboard"
+    private static let mouseKey = "Tappy.mouse"
 
     init() {
         loadStats()
@@ -104,7 +103,7 @@ final class StatsManager {
 
     func exportStats() {
         let panel = NSSavePanel()
-        panel.nameFieldStringValue = "InputTracker-backup.itbackup"
+        panel.nameFieldStringValue = "Tappy-backup.itbackup"
         panel.allowedContentTypes = [itbackupType]
         panel.canCreateDirectories = true
 

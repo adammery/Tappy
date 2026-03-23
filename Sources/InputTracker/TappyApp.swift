@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 @main
-struct InputTrackerApp: App {
+struct TappyApp: App {
     @State private var statsManager = StatsManager()
     @State private var permissionManager = PermissionManager()
     @State private var updateChecker = UpdateChecker()

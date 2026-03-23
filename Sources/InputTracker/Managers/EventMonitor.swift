@@ -57,7 +57,7 @@ final class EventMonitor: @unchecked Sendable {
             callback: EventMonitor.eventCallback,
             userInfo: userInfo
         ) else {
-            print("[InputTracker] Failed to create event tap — check Input Monitoring permission.")
+            print("[Tappy] Failed to create event tap — check Input Monitoring permission.")
             return
         }
 
@@ -71,7 +71,7 @@ final class EventMonitor: @unchecked Sendable {
             CFRunLoopRun()
         }
         monitorThread?.qualityOfService = .utility
-        monitorThread?.name = "InputTracker.EventMonitor"
+        monitorThread?.name = "Tappy.EventMonitor"
         monitorThread?.start()
 
         // Single timer flushes buffer to StatsManager
