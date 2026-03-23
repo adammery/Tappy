@@ -4,17 +4,19 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>InputTracker</string>
+    <string>Tappy</string>
     <key>CFBundleIdentifier</key>
-    <string>com.local.InputTracker</string>
+    <string>com.adammery.Tappy</string>
     <key>CFBundleVersion</key>
-    <string>1.0</string>
+    <string>0.4</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>0.4</string>
     <key>CFBundleExecutable</key>
-    <string>InputTracker</string>
+    <string>Tappy</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>LSUIElement</key>
     <true/>
     <key>NSHumanReadableCopyright</key>

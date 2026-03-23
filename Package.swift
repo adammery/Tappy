@@ -2,11 +2,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "InputTracker",
+    name: "Tappy",
     platforms: [.macOS(.v14)],
     targets: [
         .executableTarget(
-            name: "InputTracker",
+            name: "Tappy",
             path: "Sources/InputTracker"
         )
     ]
