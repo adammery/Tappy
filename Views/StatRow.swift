@@ -3,7 +3,7 @@ import SwiftUI
 private let numberFormatter: NumberFormatter = {
     let f = NumberFormatter()
     f.numberStyle = .decimal
-    f.groupingSeparator = " "
+    f.groupingSeparator = ","
     return f
 }()
 

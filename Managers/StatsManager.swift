@@ -25,7 +25,6 @@ private enum Crypto {
     }
 }
 
-private let itbackupType = UTType(exportedAs: "com.local.inputtracker.backup", conformingTo: .data)
 
 @Observable
 @MainActor
@@ -44,7 +43,10 @@ final class StatsManager {
         loadStats()
         // Single timer: auto-save every 5 minutes
         saveTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.saveStats() }
+            guard let self = self else { return }
+            Task { @MainActor in
+                self.save()
+            }
         }
     }
 
@@ -79,7 +81,7 @@ final class StatsManager {
         }
     }
 
-    private func saveStats() {
+    func save() {
         if let data = try? JSONEncoder().encode(keyboard) {
             defaults.set(data, forKey: Self.keyboardKey)
         }
@@ -92,11 +94,7 @@ final class StatsManager {
         keyboard = KeyboardStats()
         mouse = MouseStats()
         sessionStart = Date()
-        saveStats()
-    }
-
-    func save() {
-        saveStats()
+        save()
     }
 
     // MARK: - Export / Import
@@ -104,7 +102,7 @@ final class StatsManager {
     func exportStats() {
         let panel = NSSavePanel()
         panel.nameFieldStringValue = "Tappy-backup.itbackup"
-        panel.allowedContentTypes = [itbackupType]
+        panel.allowedContentTypes = [.data]
         panel.canCreateDirectories = true
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
@@ -117,7 +115,7 @@ final class StatsManager {
 
     func importStats() {
         let panel = NSOpenPanel()
-        panel.allowedContentTypes = [itbackupType]
+        panel.allowedContentTypes = [.data]
         panel.allowsMultipleSelection = false
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
@@ -127,7 +125,7 @@ final class StatsManager {
 
         keyboard = imported.keyboard
         mouse = imported.mouse
-        saveStats()
+        save()
     }
 
     // MARK: - Uptime

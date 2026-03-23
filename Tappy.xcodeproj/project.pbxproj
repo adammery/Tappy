@@ -1,0 +1,466 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		66622D052F71C7B600E144F4 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 66622D042F71C7B600E144F4 /* README.md */; };
+		66622D062F71C7B600E144F4 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 66622D032F71C7B600E144F4 /* LICENSE */; };
+		66E9B8D82F719AF50077F8F6 /* StatRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D52F719AF50077F8F6 /* StatRow.swift */; };
+		66E9B8D92F719AF50077F8F6 /* UptimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D62F719AF50077F8F6 /* UptimeView.swift */; };
+		66E9B8DA2F719AF50077F8F6 /* EventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8C72F719AF50077F8F6 /* EventMonitor.swift */; };
+		66E9B8DB2F719AF50077F8F6 /* TappyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8CF2F719AF50077F8F6 /* TappyApp.swift */; };
+		66E9B8DC2F719AF50077F8F6 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8CA2F719AF50077F8F6 /* UpdateChecker.swift */; };
+		66E9B8DD2F719AF50077F8F6 /* PermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8C82F719AF50077F8F6 /* PermissionManager.swift */; };
+		66E9B8DE2F719AF50077F8F6 /* InputStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8CC2F719AF50077F8F6 /* InputStats.swift */; };
+		66E9B8DF2F719AF50077F8F6 /* MouseStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D42F719AF50077F8F6 /* MouseStatsView.swift */; };
+		66E9B8E02F719AF50077F8F6 /* KeyboardHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D02F719AF50077F8F6 /* KeyboardHeatmapView.swift */; };
+		66E9B8E12F719AF50077F8F6 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D22F719AF50077F8F6 /* MenuBarView.swift */; };
+		66E9B8E22F719AF50077F8F6 /* KeyboardStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D12F719AF50077F8F6 /* KeyboardStatsView.swift */; };
+		66E9B8E32F719AF50077F8F6 /* KeyCodeMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8CD2F719AF50077F8F6 /* KeyCodeMap.swift */; };
+		66E9B8E42F719AF50077F8F6 /* StatsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8C92F719AF50077F8F6 /* StatsManager.swift */; };
+		66E9B8E52F719AF50077F8F6 /* MouseHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D32F719AF50077F8F6 /* MouseHeatmapView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		66622D032F71C7B600E144F4 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		66622D042F71C7B600E144F4 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		66E9B8B92F719ADB0077F8F6 /* Tappy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tappy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66E9B8C72F719AF50077F8F6 /* EventMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMonitor.swift; sourceTree = "<group>"; };
+		66E9B8C82F719AF50077F8F6 /* PermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManager.swift; sourceTree = "<group>"; };
+		66E9B8C92F719AF50077F8F6 /* StatsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsManager.swift; sourceTree = "<group>"; };
+		66E9B8CA2F719AF50077F8F6 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
+		66E9B8CC2F719AF50077F8F6 /* InputStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputStats.swift; sourceTree = "<group>"; };
+		66E9B8CD2F719AF50077F8F6 /* KeyCodeMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCodeMap.swift; sourceTree = "<group>"; };
+		66E9B8CF2F719AF50077F8F6 /* TappyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappyApp.swift; sourceTree = "<group>"; };
+		66E9B8D02F719AF50077F8F6 /* KeyboardHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardHeatmapView.swift; sourceTree = "<group>"; };
+		66E9B8D12F719AF50077F8F6 /* KeyboardStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardStatsView.swift; sourceTree = "<group>"; };
+		66E9B8D22F719AF50077F8F6 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		66E9B8D32F719AF50077F8F6 /* MouseHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseHeatmapView.swift; sourceTree = "<group>"; };
+		66E9B8D42F719AF50077F8F6 /* MouseStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseStatsView.swift; sourceTree = "<group>"; };
+		66E9B8D52F719AF50077F8F6 /* StatRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatRow.swift; sourceTree = "<group>"; };
+		66E9B8D62F719AF50077F8F6 /* UptimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UptimeView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		66B242F82F71B9DB00D41018 /* Exceptions for "Tappy" folder in "Tappy" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 66E9B8B82F719ADB0077F8F6 /* Tappy */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		66E9B8BB2F719ADB0077F8F6 /* Tappy */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				66B242F82F71B9DB00D41018 /* Exceptions for "Tappy" folder in "Tappy" target */,
+			);
+			path = Tappy;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		66E9B8B62F719ADB0077F8F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		66E9B8B02F719ADB0077F8F6 = {
+			isa = PBXGroup;
+			children = (
+				66622D032F71C7B600E144F4 /* LICENSE */,
+				66622D042F71C7B600E144F4 /* README.md */,
+				66E9B8BB2F719ADB0077F8F6 /* Tappy */,
+				66E9B8BA2F719ADB0077F8F6 /* Products */,
+				66E9B8CB2F719AF50077F8F6 /* Managers */,
+				66E9B8CE2F719AF50077F8F6 /* Models */,
+				66E9B8CF2F719AF50077F8F6 /* TappyApp.swift */,
+				66E9B8D72F719AF50077F8F6 /* Views */,
+			);
+			sourceTree = "<group>";
+		};
+		66E9B8BA2F719ADB0077F8F6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				66E9B8B92F719ADB0077F8F6 /* Tappy.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		66E9B8CB2F719AF50077F8F6 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				66E9B8C72F719AF50077F8F6 /* EventMonitor.swift */,
+				66E9B8C82F719AF50077F8F6 /* PermissionManager.swift */,
+				66E9B8C92F719AF50077F8F6 /* StatsManager.swift */,
+				66E9B8CA2F719AF50077F8F6 /* UpdateChecker.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		66E9B8CE2F719AF50077F8F6 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				66E9B8CC2F719AF50077F8F6 /* InputStats.swift */,
+				66E9B8CD2F719AF50077F8F6 /* KeyCodeMap.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		66E9B8D72F719AF50077F8F6 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				66E9B8D02F719AF50077F8F6 /* KeyboardHeatmapView.swift */,
+				66E9B8D12F719AF50077F8F6 /* KeyboardStatsView.swift */,
+				66E9B8D22F719AF50077F8F6 /* MenuBarView.swift */,
+				66E9B8D32F719AF50077F8F6 /* MouseHeatmapView.swift */,
+				66E9B8D42F719AF50077F8F6 /* MouseStatsView.swift */,
+				66E9B8D52F719AF50077F8F6 /* StatRow.swift */,
+				66E9B8D62F719AF50077F8F6 /* UptimeView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		66E9B8B82F719ADB0077F8F6 /* Tappy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 66E9B8C42F719ADC0077F8F6 /* Build configuration list for PBXNativeTarget "Tappy" */;
+			buildPhases = (
+				66E9B8B52F719ADB0077F8F6 /* Sources */,
+				66E9B8B62F719ADB0077F8F6 /* Frameworks */,
+				66E9B8B72F719ADB0077F8F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				66E9B8BB2F719ADB0077F8F6 /* Tappy */,
+			);
+			name = Tappy;
+			packageProductDependencies = (
+			);
+			productName = Tappy;
+			productReference = 66E9B8B92F719ADB0077F8F6 /* Tappy.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		66E9B8B12F719ADB0077F8F6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2630;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					66E9B8B82F719ADB0077F8F6 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+				};
+			};
+			buildConfigurationList = 66E9B8B42F719ADB0077F8F6 /* Build configuration list for PBXProject "Tappy" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 66E9B8B02F719ADB0077F8F6;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 66E9B8BA2F719ADB0077F8F6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				66E9B8B82F719ADB0077F8F6 /* Tappy */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		66E9B8B72F719ADB0077F8F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66622D052F71C7B600E144F4 /* README.md in Resources */,
+				66622D062F71C7B600E144F4 /* LICENSE in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		66E9B8B52F719ADB0077F8F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66E9B8D82F719AF50077F8F6 /* StatRow.swift in Sources */,
+				66E9B8D92F719AF50077F8F6 /* UptimeView.swift in Sources */,
+				66E9B8DA2F719AF50077F8F6 /* EventMonitor.swift in Sources */,
+				66E9B8DB2F719AF50077F8F6 /* TappyApp.swift in Sources */,
+				66E9B8DC2F719AF50077F8F6 /* UpdateChecker.swift in Sources */,
+				66E9B8DD2F719AF50077F8F6 /* PermissionManager.swift in Sources */,
+				66E9B8DE2F719AF50077F8F6 /* InputStats.swift in Sources */,
+				66E9B8DF2F719AF50077F8F6 /* MouseStatsView.swift in Sources */,
+				66E9B8E02F719AF50077F8F6 /* KeyboardHeatmapView.swift in Sources */,
+				66E9B8E12F719AF50077F8F6 /* MenuBarView.swift in Sources */,
+				66E9B8E22F719AF50077F8F6 /* KeyboardStatsView.swift in Sources */,
+				66E9B8E32F719AF50077F8F6 /* KeyCodeMap.swift in Sources */,
+				66E9B8E42F719AF50077F8F6 /* StatsManager.swift in Sources */,
+				66E9B8E52F719AF50077F8F6 /* MouseHeatmapView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		66E9B8C22F719ADC0077F8F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		66E9B8C32F719ADC0077F8F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		66E9B8C52F719ADC0077F8F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SELECTED_FILES = readwrite;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Tappy/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Tappy;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Adam Mery";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.7;
+				PRODUCT_BUNDLE_IDENTIFIER = com.adammery.Tappy;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		66E9B8C62F719ADC0077F8F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SELECTED_FILES = readwrite;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Tappy/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Tappy;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Adam Mery";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.7;
+				PRODUCT_BUNDLE_IDENTIFIER = com.adammery.Tappy;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		66E9B8B42F719ADB0077F8F6 /* Build configuration list for PBXProject "Tappy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66E9B8C22F719ADC0077F8F6 /* Debug */,
+				66E9B8C32F719ADC0077F8F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		66E9B8C42F719ADC0077F8F6 /* Build configuration list for PBXNativeTarget "Tappy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66E9B8C52F719ADC0077F8F6 /* Debug */,
+				66E9B8C62F719ADC0077F8F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 66E9B8B12F719ADB0077F8F6 /* Project object */;
+}

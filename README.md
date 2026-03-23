@@ -18,14 +18,15 @@ Tappy uses macOS Input Monitoring to count key presses and clicks. It does **not
 
 ## Install
 
-```bash
-git clone https://github.com/adammery/Tappy.git
-cd Tappy
-bash scripts/bundle.sh
-open build/Tappy.app
-```
+1. Download the latest `.dmg` from [Releases](https://github.com/adammery/Tappy/releases)
+2. Open the DMG and drag Tappy to Applications
+3. Since the app is not signed with an Apple Developer ID, macOS will block it. Right-click Tappy → **Open** → **Open**, or run:
+   ```bash
+   xattr -cr /Applications/Tappy.app
+   ```
+4. Grant **Input Monitoring** permission when prompted (System Settings → Privacy & Security → Input Monitoring)
 
-Requires macOS 14+ and Swift 6.
+Requires macOS 14+.
 
 ## License
 
