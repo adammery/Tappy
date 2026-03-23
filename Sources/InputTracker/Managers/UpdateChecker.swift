@@ -5,8 +5,8 @@ import Observation
 @MainActor
 final class UpdateChecker {
     static let currentVersion = "0.4"
-    static let repoOwner = "OWNER"
-    static let repoName = "InputTracker"
+    static let repoOwner = "adammery"
+    static let repoName = "Tappy"
 
     var latestVersion: String?
     var updateURL: String?
