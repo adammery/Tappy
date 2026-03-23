@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 @main
 struct InputTrackerApp: App {
@@ -7,8 +8,15 @@ struct InputTrackerApp: App {
     @State private var updateChecker = UpdateChecker()
     @State private var eventMonitor: EventMonitor?
 
+    init() {
+        let running = NSRunningApplication.runningApplications(withBundleIdentifier: "com.adammery.Tappy")
+        if running.count > 1 {
+            NSApp.terminate(nil)
+        }
+    }
+
     var body: some Scene {
-        MenuBarExtra("InputTracker", systemImage: "keyboard") {
+        MenuBarExtra("Tappy", systemImage: "keyboard") {
             MenuBarView(
                 stats: statsManager,
                 permission: permissionManager,
