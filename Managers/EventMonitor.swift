@@ -3,17 +3,14 @@
 import Foundation
 import AppKit
 
-struct BatchAppCount: Sendable {
-    var keystrokes: Int = 0
-    var clicks: Int = 0
-}
-
 struct EventBatch: Sendable {
     var keystrokes: [(keyCode: UInt16, timestamp: TimeInterval)] = []
     var leftClicks: Int = 0
     var rightClicks: Int = 0
     var middleClicks: Int = 0
-    var perApp: [String: BatchAppCount] = [:]
+    var appName: String?
+    var appKeystrokes: Int = 0
+    var appClicks: Int = 0
 
     var isEmpty: Bool {
         keystrokes.isEmpty && leftClicks == 0 && rightClicks == 0 && middleClicks == 0
@@ -24,7 +21,9 @@ struct EventBatch: Sendable {
         leftClicks = 0
         rightClicks = 0
         middleClicks = 0
-        perApp.removeAll(keepingCapacity: true)
+        appName = nil
+        appKeystrokes = 0
+        appClicks = 0
     }
 }
 
@@ -99,22 +98,34 @@ final class EventMonitor: @unchecked Sendable {
     @objc private func appDidActivate(_ notification: Notification) {
         guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
               let name = app.localizedName else { return }
+        // Flush current batch so it's attributed to the old app, then switch
         lock.lock()
+        let hadData = !buffer.isEmpty
+        var batch: EventBatch?
+        if hadData {
+            batch = buffer
+            buffer.reset()
+        }
         currentAppName = name
         lock.unlock()
+
+        if let batch = batch {
+            Task { @MainActor [weak statsManager] in
+                statsManager?.applyBatch(batch)
+            }
+        }
     }
 
-    /// Menu opened — flush + save, start 4fps UI timer
-    /// Menu closed — stop timer, flush last batch
+    /// Menu opened/closed — controls UI refresh timer
     func setLive(_ live: Bool) {
+        uiTimer?.invalidate()
+        uiTimer = nil
         if live {
             flushToUI()
             uiTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
                 self?.flushToUI()
             }
         } else {
-            uiTimer?.invalidate()
-            uiTimer = nil
             flushToUI()
         }
     }
@@ -141,9 +152,6 @@ final class EventMonitor: @unchecked Sendable {
         lock.unlock()
 
         guard !batch.isEmpty else { return }
-        #if DEBUG
-        print("[Tappy] RAM flush: \(batch.keystrokes.count) keys, \(batch.leftClicks + batch.rightClicks + batch.middleClicks) clicks")
-        #endif
         Task { @MainActor [weak statsManager] in
             statsManager?.applyBatch(batch)
         }
@@ -154,12 +162,8 @@ final class EventMonitor: @unchecked Sendable {
         lock.lock()
         let batch = buffer
         buffer.reset()
-        eventsSinceLastSave = 0
         lock.unlock()
 
-        #if DEBUG
-        print("[Tappy] DISK save: \(batch.keystrokes.count) keys buffered")
-        #endif
         Task { @MainActor [weak statsManager] in
             if !batch.isEmpty {
                 statsManager?.applyBatch(batch)
@@ -168,7 +172,7 @@ final class EventMonitor: @unchecked Sendable {
         }
     }
 
-    // Fast callback — appends to buffer, triggers threshold save
+    // Fast callback — appends to buffer only, no dictionary ops
     private static let eventCallback: CGEventTapCallBack = {
         (proxy, type, event, userInfo) -> Unmanaged<CGEvent>? in
 
@@ -187,13 +191,17 @@ final class EventMonitor: @unchecked Sendable {
 
         let now = Date().timeIntervalSince1970
         monitor.lock.lock()
-        let appName = monitor.currentAppName
+
+        // Tag batch with current app (cheap — just pointer copy when same app)
+        if monitor.buffer.appName == nil {
+            monitor.buffer.appName = monitor.currentAppName
+        }
 
         switch type {
         case .keyDown:
             let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
             monitor.buffer.keystrokes.append((keyCode, now))
-            monitor.buffer.perApp[appName, default: BatchAppCount()].keystrokes += 1
+            monitor.buffer.appKeystrokes += 1
             monitor.eventsSinceLastSave += 1
         case .flagsChanged:
             let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
@@ -208,26 +216,29 @@ final class EventMonitor: @unchecked Sendable {
             }
             if isDown {
                 monitor.buffer.keystrokes.append((keyCode, now))
-                monitor.buffer.perApp[appName, default: BatchAppCount()].keystrokes += 1
+                monitor.buffer.appKeystrokes += 1
                 monitor.eventsSinceLastSave += 1
             }
         case .leftMouseDown:
             monitor.buffer.leftClicks += 1
-            monitor.buffer.perApp[appName, default: BatchAppCount()].clicks += 1
+            monitor.buffer.appClicks += 1
             monitor.eventsSinceLastSave += 1
         case .rightMouseDown:
             monitor.buffer.rightClicks += 1
-            monitor.buffer.perApp[appName, default: BatchAppCount()].clicks += 1
+            monitor.buffer.appClicks += 1
             monitor.eventsSinceLastSave += 1
         case .otherMouseDown:
             monitor.buffer.middleClicks += 1
-            monitor.buffer.perApp[appName, default: BatchAppCount()].clicks += 1
+            monitor.buffer.appClicks += 1
             monitor.eventsSinceLastSave += 1
         default:
             break
         }
 
         let shouldSave = monitor.eventsSinceLastSave >= EventMonitor.saveThreshold
+        if shouldSave {
+            monitor.eventsSinceLastSave = 0
+        }
         monitor.lock.unlock()
 
         if shouldSave {

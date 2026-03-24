@@ -73,10 +73,10 @@ final class StatsManager {
         mouse.rightClicks += batch.rightClicks
         mouse.middleClicks += batch.middleClicks
 
-        // Per-app stats
-        for (app, counts) in batch.perApp {
-            perApp[app, default: AppStats()].keystrokes += counts.keystrokes
-            perApp[app, default: AppStats()].clicks += counts.clicks
+        // Per-app stats — batch is tagged with one app name
+        if let app = batch.appName {
+            perApp[app, default: AppStats()].keystrokes += batch.appKeystrokes
+            perApp[app, default: AppStats()].clicks += batch.appClicks
         }
 
         keyboard.trimTimestamps()
