@@ -5,6 +5,10 @@ A lightweight macOS menu bar app that tracks your keyboard and mouse activity �
 ![macOS](https://img.shields.io/badge/macOS-14%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Release](https://img.shields.io/github/v/release/adammery/Tappy)
+
+<img width="356" height="563" alt="Screenshot 2026-03-24 at 12 22 17" src="https://github.com/user-attachments/assets/f84223d8-587d-434d-9ff3-cc36c85847f3" />
+<img width="356" height="674" alt="Screenshot 2026-03-24 at 12 22 24" src="https://github.com/user-attachments/assets/c3eab84d-9a6f-4276-b2b2-bd230487fb6c" />
+
 ---
 
 ## ⚠️ macOS Installation Note
