@@ -5,10 +5,6 @@ struct KeyboardStats: Codable, Sendable {
     var keyFrequency: [UInt16: Int] = [:]
     var recentTimestamps: [TimeInterval] = []
 
-    var topKeys: [(keyCode: UInt16, count: Int)] {
-        keyFrequency.sorted { $0.value > $1.value }.prefix(10).map { ($0.key, $0.value) }
-    }
-
     var typingSpeed: Double {
         let now = Date().timeIntervalSince1970
         let recent = recentTimestamps.filter { now - $0 < 60.0 }
@@ -46,4 +42,10 @@ struct MouseStats: Codable, Sendable {
     var middleClicks: Int = 0
 
     var totalClicks: Int { leftClicks + rightClicks + middleClicks }
+}
+
+struct AppStats: Codable, Sendable {
+    var keystrokes: Int = 0
+    var clicks: Int = 0
+    var totalInputs: Int { keystrokes + clicks }
 }

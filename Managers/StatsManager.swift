@@ -7,11 +7,28 @@ import UniformTypeIdentifiers
 struct ExportData: Codable {
     var keyboard: KeyboardStats
     var mouse: MouseStats
+    var perApp: [String: AppStats]
     var exportedAt: Date
+
+    // Backwards-compatible decode: perApp may not exist in old backups
+    init(keyboard: KeyboardStats, mouse: MouseStats, perApp: [String: AppStats] = [:], exportedAt: Date) {
+        self.keyboard = keyboard
+        self.mouse = mouse
+        self.perApp = perApp
+        self.exportedAt = exportedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        keyboard = try c.decode(KeyboardStats.self, forKey: .keyboard)
+        mouse = try c.decode(MouseStats.self, forKey: .mouse)
+        perApp = (try? c.decode([String: AppStats].self, forKey: .perApp)) ?? [:]
+        exportedAt = try c.decode(Date.self, forKey: .exportedAt)
+    }
 }
 
 private enum Crypto {
-    private static let keyData = Data("Tappy!secret!!v1".utf8)
+    private static let keyData = Data("Tappy!secret!!v1!extra!secure32".utf8)
     private static var key: SymmetricKey { SymmetricKey(data: keyData) }
 
     static func encrypt(_ data: Data) throws -> Data {
@@ -31,23 +48,17 @@ private enum Crypto {
 final class StatsManager {
     var keyboard = KeyboardStats()
     var mouse = MouseStats()
+    var perApp: [String: AppStats] = [:]
     var sessionStart = Date()
     var tick: Bool = false
 
-    private var saveTimer: Timer?
     private let defaults = UserDefaults.standard
     private static let keyboardKey = "Tappy.keyboard"
     private static let mouseKey = "Tappy.mouse"
+    private static let perAppKey = "Tappy.perApp"
 
     init() {
         loadStats()
-        // Single timer: auto-save every 5 minutes
-        saveTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            Task { @MainActor in
-                self.save()
-            }
-        }
     }
 
     // MARK: - Batch processing (called by EventMonitor flush)
@@ -62,9 +73,13 @@ final class StatsManager {
         mouse.rightClicks += batch.rightClicks
         mouse.middleClicks += batch.middleClicks
 
-        // Trim old timestamps inline
+        // Per-app stats
+        for (app, counts) in batch.perApp {
+            perApp[app, default: AppStats()].keystrokes += counts.keystrokes
+            perApp[app, default: AppStats()].clicks += counts.clicks
+        }
+
         keyboard.trimTimestamps()
-        // Toggle tick to refresh uptime display
         tick.toggle()
     }
 
@@ -79,6 +94,10 @@ final class StatsManager {
            let decoded = try? JSONDecoder().decode(MouseStats.self, from: data) {
             mouse = decoded
         }
+        if let data = defaults.data(forKey: Self.perAppKey),
+           let decoded = try? JSONDecoder().decode([String: AppStats].self, from: data) {
+            perApp = decoded
+        }
     }
 
     func save() {
@@ -88,11 +107,15 @@ final class StatsManager {
         if let data = try? JSONEncoder().encode(mouse) {
             defaults.set(data, forKey: Self.mouseKey)
         }
+        if let data = try? JSONEncoder().encode(perApp) {
+            defaults.set(data, forKey: Self.perAppKey)
+        }
     }
 
     func resetStats() {
         keyboard = KeyboardStats()
         mouse = MouseStats()
+        perApp = [:]
         sessionStart = Date()
         save()
     }
@@ -107,7 +130,7 @@ final class StatsManager {
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
 
-        let export = ExportData(keyboard: keyboard, mouse: mouse, exportedAt: Date())
+        let export = ExportData(keyboard: keyboard, mouse: mouse, perApp: perApp, exportedAt: Date())
         guard let json = try? JSONEncoder().encode(export),
               let encrypted = try? Crypto.encrypt(json) else { return }
         try? encrypted.write(to: url)
@@ -125,6 +148,7 @@ final class StatsManager {
 
         keyboard = imported.keyboard
         mouse = imported.mouse
+        perApp = imported.perApp
         save()
     }
 

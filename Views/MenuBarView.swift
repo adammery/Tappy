@@ -7,6 +7,7 @@ struct MenuBarView: View {
     var onStart: () -> Void
     var onLive: ((Bool) -> Void)?
     @State private var showOptions = false
+    @State private var showAllApps = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -16,6 +17,10 @@ struct MenuBarView: View {
                 totalView
                 Divider()
                 keyboardSection
+                if !stats.perApp.isEmpty {
+                    Divider()
+                    perAppSection
+                }
                 Divider()
                 mouseSection
                 Divider()
@@ -30,6 +35,7 @@ struct MenuBarView: View {
             permission.checkPermission()
             if permission.hasPermission {
                 onStart()
+                onLive?(true)
             }
         }
         .onAppear { onLive?(true) }
@@ -92,6 +98,76 @@ struct MenuBarView: View {
                 middleClicks: stats.mouse.middleClicks
             )
             .padding(.top, 2)
+        }
+    }
+
+    private var perAppSection: some View {
+        let sorted = stats.perApp.sorted { $0.value.totalInputs > $1.value.totalInputs }
+        let top5 = Array(sorted.prefix(5))
+        let maxInputs = top5.first?.value.totalInputs ?? 1
+        let totalAll = stats.perApp.values.reduce(0) { $0 + $1.totalInputs }
+
+        return VStack(alignment: .leading, spacing: 6) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    showAllApps.toggle()
+                }
+            } label: {
+                HStack {
+                    Label("Apps", systemImage: "square.grid.2x2")
+                        .font(.headline)
+                    Spacer()
+                    Image(systemName: showAllApps ? "chevron.up" : "chevron.down")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .buttonStyle(.borderless)
+
+            // Always show #1
+            if let first = top5.first {
+                appRow(index: 1, name: first.key, inputs: first.value.totalInputs, maxInputs: maxInputs, totalAll: totalAll)
+            }
+
+            // Expanded: show #2-5
+            if showAllApps {
+                ForEach(Array(top5.dropFirst().enumerated()), id: \.element.key) { i, entry in
+                    appRow(index: i + 2, name: entry.key, inputs: entry.value.totalInputs, maxInputs: maxInputs, totalAll: totalAll)
+                }
+            }
+        }
+    }
+
+    private static let barWidth: CGFloat = 80
+
+    private func appRow(index: Int, name: String, inputs: Int, maxInputs: Int, totalAll: Int) -> some View {
+        let pct = totalAll > 0 ? Double(inputs) / Double(totalAll) * 100 : 0
+        let ratio = CGFloat(inputs) / CGFloat(max(maxInputs, 1))
+        return HStack(spacing: 6) {
+            Text("\(index).")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .frame(width: 14, alignment: .trailing)
+            Text(name)
+                .font(.caption)
+                .lineLimit(1)
+                .frame(width: 70, alignment: .leading)
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.primary.opacity(0.05))
+                    .frame(width: Self.barWidth, height: 10)
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.orange.opacity(0.3 + ratio * 0.5))
+                    .frame(width: Self.barWidth * ratio, height: 10)
+            }
+            Text(inputs.compact)
+                .font(.caption2)
+                .fontDesign(.monospaced)
+                .frame(width: 42, alignment: .trailing)
+            Text(String(format: "%.0f%%", pct))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .frame(width: 28, alignment: .trailing)
         }
     }
 
