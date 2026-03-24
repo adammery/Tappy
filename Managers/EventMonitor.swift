@@ -43,6 +43,7 @@ final class EventMonitor: @unchecked Sendable {
 
         let eventMask: CGEventMask =
             (1 << CGEventType.keyDown.rawValue) |
+            (1 << CGEventType.flagsChanged.rawValue) |
             (1 << CGEventType.leftMouseDown.rawValue) |
             (1 << CGEventType.rightMouseDown.rawValue) |
             (1 << CGEventType.otherMouseDown.rawValue)
@@ -128,6 +129,21 @@ final class EventMonitor: @unchecked Sendable {
         case .keyDown:
             let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
             monitor.buffer.keystrokes.append((keyCode, now))
+        case .flagsChanged:
+            let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
+            let flags = event.flags
+            // Only count key-down (modifier pressed), not key-up (modifier released)
+            let isDown = switch keyCode {
+                case 54, 55: flags.contains(.maskCommand)
+                case 56, 60: flags.contains(.maskShift)
+                case 58, 61: flags.contains(.maskAlternate)
+                case 59, 62: flags.contains(.maskControl)
+                case 57: flags.contains(.maskAlphaShift) // Caps Lock
+                default: false
+            }
+            if isDown {
+                monitor.buffer.keystrokes.append((keyCode, now))
+            }
         case .leftMouseDown:
             monitor.buffer.leftClicks += 1
         case .rightMouseDown:
