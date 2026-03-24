@@ -5,6 +5,7 @@ struct MenuBarView: View {
     var permission: PermissionManager
     var updateChecker: UpdateChecker
     var onStart: () -> Void
+    var onLive: ((Bool) -> Void)?
     @State private var showOptions = false
 
     var body: some View {
@@ -34,6 +35,8 @@ struct MenuBarView: View {
                 onStart()
             }
         }
+        .onAppear { onLive?(true) }
+        .onDisappear { onLive?(false) }
     }
 
     private var totalView: some View {

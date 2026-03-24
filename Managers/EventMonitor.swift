@@ -81,6 +81,15 @@ final class EventMonitor: @unchecked Sendable {
         }
     }
 
+    func setLive(_ live: Bool) {
+        flushTimer?.invalidate()
+        let interval = live ? 0.5 : flushInterval
+        flushTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
+            self?.flush()
+        }
+        if live { flush() }
+    }
+
     func stop() {
         flushTimer?.invalidate()
         flushTimer = nil

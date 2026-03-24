@@ -21,7 +21,8 @@ struct TappyApp: App {
                 stats: statsManager,
                 permission: permissionManager,
                 updateChecker: updateChecker,
-                onStart: startMonitoring
+                onStart: startMonitoring,
+                onLive: { live in eventMonitor?.setLive(live) }
             )
         }
         .menuBarExtraStyle(.window)
