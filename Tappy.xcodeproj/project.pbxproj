@@ -10,16 +10,13 @@
 		66622D052F71C7B600E144F4 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 66622D042F71C7B600E144F4 /* README.md */; };
 		66622D062F71C7B600E144F4 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 66622D032F71C7B600E144F4 /* LICENSE */; };
 		66E9B8D82F719AF50077F8F6 /* StatRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D52F719AF50077F8F6 /* StatRow.swift */; };
-		66E9B8D92F719AF50077F8F6 /* UptimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D62F719AF50077F8F6 /* UptimeView.swift */; };
 		66E9B8DA2F719AF50077F8F6 /* EventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8C72F719AF50077F8F6 /* EventMonitor.swift */; };
 		66E9B8DB2F719AF50077F8F6 /* TappyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8CF2F719AF50077F8F6 /* TappyApp.swift */; };
 		66E9B8DC2F719AF50077F8F6 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8CA2F719AF50077F8F6 /* UpdateChecker.swift */; };
 		66E9B8DD2F719AF50077F8F6 /* PermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8C82F719AF50077F8F6 /* PermissionManager.swift */; };
 		66E9B8DE2F719AF50077F8F6 /* InputStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8CC2F719AF50077F8F6 /* InputStats.swift */; };
-		66E9B8DF2F719AF50077F8F6 /* MouseStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D42F719AF50077F8F6 /* MouseStatsView.swift */; };
 		66E9B8E02F719AF50077F8F6 /* KeyboardHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D02F719AF50077F8F6 /* KeyboardHeatmapView.swift */; };
 		66E9B8E12F719AF50077F8F6 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D22F719AF50077F8F6 /* MenuBarView.swift */; };
-		66E9B8E22F719AF50077F8F6 /* KeyboardStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D12F719AF50077F8F6 /* KeyboardStatsView.swift */; };
 		66E9B8E32F719AF50077F8F6 /* KeyCodeMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8CD2F719AF50077F8F6 /* KeyCodeMap.swift */; };
 		66E9B8E42F719AF50077F8F6 /* StatsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8C92F719AF50077F8F6 /* StatsManager.swift */; };
 		66E9B8E52F719AF50077F8F6 /* MouseHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D32F719AF50077F8F6 /* MouseHeatmapView.swift */; };
@@ -37,12 +34,9 @@
 		66E9B8CD2F719AF50077F8F6 /* KeyCodeMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCodeMap.swift; sourceTree = "<group>"; };
 		66E9B8CF2F719AF50077F8F6 /* TappyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappyApp.swift; sourceTree = "<group>"; };
 		66E9B8D02F719AF50077F8F6 /* KeyboardHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardHeatmapView.swift; sourceTree = "<group>"; };
-		66E9B8D12F719AF50077F8F6 /* KeyboardStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardStatsView.swift; sourceTree = "<group>"; };
 		66E9B8D22F719AF50077F8F6 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		66E9B8D32F719AF50077F8F6 /* MouseHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseHeatmapView.swift; sourceTree = "<group>"; };
-		66E9B8D42F719AF50077F8F6 /* MouseStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseStatsView.swift; sourceTree = "<group>"; };
 		66E9B8D52F719AF50077F8F6 /* StatRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatRow.swift; sourceTree = "<group>"; };
-		66E9B8D62F719AF50077F8F6 /* UptimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UptimeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -123,12 +117,9 @@
 			isa = PBXGroup;
 			children = (
 				66E9B8D02F719AF50077F8F6 /* KeyboardHeatmapView.swift */,
-				66E9B8D12F719AF50077F8F6 /* KeyboardStatsView.swift */,
 				66E9B8D22F719AF50077F8F6 /* MenuBarView.swift */,
 				66E9B8D32F719AF50077F8F6 /* MouseHeatmapView.swift */,
-				66E9B8D42F719AF50077F8F6 /* MouseStatsView.swift */,
 				66E9B8D52F719AF50077F8F6 /* StatRow.swift */,
-				66E9B8D62F719AF50077F8F6 /* UptimeView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -210,16 +201,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				66E9B8D82F719AF50077F8F6 /* StatRow.swift in Sources */,
-				66E9B8D92F719AF50077F8F6 /* UptimeView.swift in Sources */,
 				66E9B8DA2F719AF50077F8F6 /* EventMonitor.swift in Sources */,
 				66E9B8DB2F719AF50077F8F6 /* TappyApp.swift in Sources */,
 				66E9B8DC2F719AF50077F8F6 /* UpdateChecker.swift in Sources */,
 				66E9B8DD2F719AF50077F8F6 /* PermissionManager.swift in Sources */,
 				66E9B8DE2F719AF50077F8F6 /* InputStats.swift in Sources */,
-				66E9B8DF2F719AF50077F8F6 /* MouseStatsView.swift in Sources */,
 				66E9B8E02F719AF50077F8F6 /* KeyboardHeatmapView.swift in Sources */,
 				66E9B8E12F719AF50077F8F6 /* MenuBarView.swift in Sources */,
-				66E9B8E22F719AF50077F8F6 /* KeyboardStatsView.swift in Sources */,
 				66E9B8E32F719AF50077F8F6 /* KeyCodeMap.swift in Sources */,
 				66E9B8E42F719AF50077F8F6 /* StatsManager.swift in Sources */,
 				66E9B8E52F719AF50077F8F6 /* MouseHeatmapView.swift in Sources */,

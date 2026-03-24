@@ -33,7 +33,7 @@ final class EventMonitor: @unchecked Sendable {
 
     let flushInterval: TimeInterval
 
-    init(statsManager: StatsManager, flushInterval: TimeInterval = 3.0) {
+    init(statsManager: StatsManager, flushInterval: TimeInterval = 15.0) {
         self.statsManager = statsManager
         self.flushInterval = flushInterval
     }

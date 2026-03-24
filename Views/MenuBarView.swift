@@ -15,14 +15,11 @@ struct MenuBarView: View {
             } else {
                 totalView
                 Divider()
-                KeyboardStatsView(keyboard: stats.keyboard)
+                keyboardSection
                 Divider()
-                MouseStatsView(mouse: stats.mouse)
+                mouseSection
                 Divider()
-                UptimeView(
-                    systemUptime: stats.systemUptime,
-                    sessionDuration: stats.sessionDuration
-                )
+                uptimeSection
                 Divider()
                 footerView
             }
@@ -70,6 +67,40 @@ struct MenuBarView: View {
                         .fontDesign(.monospaced)
                 }
             }
+        }
+    }
+
+    private var keyboardSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label("Keyboard", systemImage: "keyboard")
+                .font(.headline)
+            StatRow(label: "Keystrokes", value: stats.keyboard.totalKeystrokes.compact)
+            StatRow(label: "Speed", value: "\(Int(stats.keyboard.typingSpeed)) keys/min")
+            KeyboardHeatmapView(keyFrequency: stats.keyboard.keyFrequency)
+                .padding(.top, 2)
+        }
+    }
+
+    private var mouseSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label("Mouse", systemImage: "computermouse")
+                .font(.headline)
+            StatRow(label: "Total Clicks", value: stats.mouse.totalClicks.compact)
+            MouseHeatmapView(
+                leftClicks: stats.mouse.leftClicks,
+                rightClicks: stats.mouse.rightClicks,
+                middleClicks: stats.mouse.middleClicks
+            )
+            .padding(.top, 2)
+        }
+    }
+
+    private var uptimeSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label("Uptime", systemImage: "clock")
+                .font(.headline)
+            StatRow(label: "System", value: stats.systemUptime)
+            StatRow(label: "Session", value: stats.sessionDuration)
         }
     }
 
