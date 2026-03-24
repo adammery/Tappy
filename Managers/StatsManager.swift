@@ -28,7 +28,7 @@ struct ExportData: Codable {
 }
 
 private enum Crypto {
-    private static let keyData = Data("Tappy!secret!!v1!extra!secure32".utf8)
+    private static let keyData = Data("Tappy!secret!!v1!extra!secure32!".utf8)
     private static var key: SymmetricKey { SymmetricKey(data: keyData) }
 
     static func encrypt(_ data: Data) throws -> Data {

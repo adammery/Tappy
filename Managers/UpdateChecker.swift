@@ -4,7 +4,7 @@ import Observation
 @Observable
 @MainActor
 final class UpdateChecker {
-    static let currentVersion = "0.8.2"
+    static let currentVersion = "0.8.3"
     static let repoOwner = "adammery"
     static let repoName = "Tappy"
 
