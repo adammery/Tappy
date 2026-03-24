@@ -2,6 +2,9 @@
 
 A lightweight macOS menu bar app that tracks your keyboard and mouse activity — keystrokes, clicks, typing speed, and a keyboard heatmap.
 
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Release](https://img.shields.io/github/v/release/adammery/Tappy)
 ---
 
 ## ⚠️ macOS Installation Note
