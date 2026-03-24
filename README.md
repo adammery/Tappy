@@ -1,32 +1,74 @@
 # Tappy
 
-A lightweight macOS menu bar app that tracks your keyboard and mouse activity - keystrokes, clicks, typing speed, and a keyboard heatmap.
+A lightweight macOS menu bar app that tracks your keyboard and mouse activity — keystrokes, clicks, typing speed, and a keyboard heatmap.
+
+---
+
+## ⚠️ macOS Installation Note
+
+Tappy is open-source and not signed with an Apple Developer ID.
+Because of this, macOS may say the app is **damaged** when opening it for the first time. This is expected and does **not** mean the app is unsafe.
+
+Fix in 5 seconds:
+
+```bash
+xattr -cr /Applications/Tappy.app
+```
+
+Alternatively:
+Right-click **Tappy.app** → **Open** → **Open**
+
+---
+
+## 🚀 Quick Start
+
+1. Download the latest `.dmg` from [Releases](https://github.com/adammery/Tappy/releases)
+2. Open the DMG and drag **Tappy** to **Applications**
+3. Run:
+
+```bash
+xattr -cr /Applications/Tappy.app
+```
+
+4. Launch Tappy
+5. Grant **Input Monitoring** permission when prompted
+   *(System Settings → Privacy & Security → Input Monitoring)*
+6. Restart Tappy
+
+Requires **macOS 14+**
+
+---
 
 ## Features
 
-- **Keyboard tracking** - total keystrokes, typing speed (keys/min), keyboard heatmap
-- **Mouse tracking** - total clicks with left/right/middle breakdown
-- **System uptime** - system and session duration
-- **Export / Import** - encrypted backup file (.itbackup) for transferring data between devices
-- **Check for updates** - checks GitHub releases for new versions
+* **Keyboard tracking** — total keystrokes, typing speed (keys/min), keyboard heatmap
+* **Mouse tracking** — total clicks with left/right/middle breakdown
+* **System uptime** — system and session duration
+* **Export / Import** — encrypted backup file (`.itbackup`) for transferring data between devices
+* **Check for updates** — checks GitHub releases for new versions
+
+---
 
 ## Privacy
 
-All data is stored **locally on your Mac** (UserDefaults). Tappy has no network connection, no analytics, no telemetry. The only outbound request is the optional "Check for Update" which hits the GitHub API.
+All data is stored **locally on your Mac** using UserDefaults.
 
-Tappy uses macOS Input Monitoring to count key presses and clicks. It does **not** record what you type — only that a key was pressed.
+Tappy:
 
-## Install
+* has **no analytics**
+* has **no telemetry**
+* sends **no usage data**
+* does **not** track or upload personal information
 
-1. Download the latest `.dmg` from [Releases](https://github.com/adammery/Tappy/releases)
-2. Open the DMG and drag Tappy to Applications
-3. Since the app is not signed with an Apple Developer ID, macOS will block it. Right-click Tappy → **Open** → **Open**, or run:
-   ```bash
-   xattr -cr /Applications/Tappy.app
-   ```
-4. Grant **Input Monitoring** permission when prompted (System Settings → Privacy & Security → Input Monitoring)
+The only outbound request is the optional **Check for Updates**, which queries the GitHub API.
 
-Requires macOS 14+.
+Tappy uses macOS **Input Monitoring** permission only to count activity events.
+
+* It does **not** record what you type
+* It does **not** capture text or passwords
+* It only counts that a key or mouse button was pressed
+
+---
 
 ## License
 
