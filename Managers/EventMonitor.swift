@@ -8,9 +8,8 @@ struct EventBatch: Sendable {
     var leftClicks: Int = 0
     var rightClicks: Int = 0
     var middleClicks: Int = 0
-    var appName: String?
-    var appKeystrokes: Int = 0
-    var appClicks: Int = 0
+    var appKeystrokes: [String: Int] = [:]
+    var appClicks: [String: Int] = [:]
 
     var isEmpty: Bool {
         keystrokes.isEmpty && leftClicks == 0 && rightClicks == 0 && middleClicks == 0
@@ -21,9 +20,8 @@ struct EventBatch: Sendable {
         leftClicks = 0
         rightClicks = 0
         middleClicks = 0
-        appName = nil
-        appKeystrokes = 0
-        appClicks = 0
+        appKeystrokes.removeAll(keepingCapacity: true)
+        appClicks.removeAll(keepingCapacity: true)
     }
 }
 
@@ -38,11 +36,11 @@ final class EventMonitor: @unchecked Sendable {
     private var buffer = EventBatch()
     private var currentAppName: String = "Unknown"
     private var eventsSinceLastSave: Int = 0
+    private var isLive: Bool = false
+    private var flushScheduled: Bool = false
+    private var saveTimer: Timer?
 
-    // UI timer: 4fps when menu is open
-    private var uiTimer: Timer?
-
-    private static let saveThreshold = 300
+    private static let saveThreshold = 200
 
     init(statsManager: StatsManager) {
         self.statsManager = statsManager
@@ -77,7 +75,9 @@ final class EventMonitor: @unchecked Sendable {
             callback: EventMonitor.eventCallback,
             userInfo: userInfo
         ) else {
+            #if DEBUG
             print("[Tappy] Failed to create event tap — check Input Monitoring permission.")
+            #endif
             return
         }
 
@@ -93,46 +93,38 @@ final class EventMonitor: @unchecked Sendable {
         monitorThread?.qualityOfService = .utility
         monitorThread?.name = "Tappy.EventMonitor"
         monitorThread?.start()
+
+        saveTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
+            self?.flushAndSave()
+        }
     }
 
     @objc private func appDidActivate(_ notification: Notification) {
         guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
               let name = app.localizedName else { return }
-        // Flush current batch so it's attributed to the old app, then switch
+        #if DEBUG
+        print("[Tappy] App switch → \(name)")
+        #endif
         lock.lock()
-        let hadData = !buffer.isEmpty
-        var batch: EventBatch?
-        if hadData {
-            batch = buffer
-            buffer.reset()
-        }
         currentAppName = name
         lock.unlock()
-
-        if let batch = batch {
-            Task { @MainActor [weak statsManager] in
-                statsManager?.applyBatch(batch)
-            }
-        }
     }
 
-    /// Menu opened/closed — controls UI refresh timer
+    /// Menu opened/closed — no timer, callback drives UI flushes
     func setLive(_ live: Bool) {
-        uiTimer?.invalidate()
-        uiTimer = nil
-        if live {
-            flushToUI()
-            uiTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
-                self?.flushToUI()
-            }
-        } else {
-            flushToUI()
-        }
+        lock.lock()
+        isLive = live
+        lock.unlock()
+        flushToUI()
     }
 
     func stop() {
-        uiTimer?.invalidate()
-        uiTimer = nil
+        saveTimer?.invalidate()
+        saveTimer = nil
+        lock.lock()
+        isLive = false
+        flushScheduled = false
+        lock.unlock()
         NSWorkspace.shared.notificationCenter.removeObserver(self)
         if let tap = eventTap {
             CGEvent.tapEnable(tap: tap, enable: false)
@@ -147,11 +139,15 @@ final class EventMonitor: @unchecked Sendable {
     /// Flush buffer → StatsManager (RAM only, no disk write)
     private func flushToUI() {
         lock.lock()
+        flushScheduled = false
         let batch = buffer
         buffer.reset()
         lock.unlock()
 
         guard !batch.isEmpty else { return }
+        #if DEBUG
+        print("[Tappy] RAM flush: \(batch.keystrokes.count) keys, \(batch.leftClicks + batch.rightClicks + batch.middleClicks) clicks")
+        #endif
         Task { @MainActor [weak statsManager] in
             statsManager?.applyBatch(batch)
         }
@@ -160,10 +156,14 @@ final class EventMonitor: @unchecked Sendable {
     /// Flush buffer → StatsManager → UserDefaults (disk save)
     private func flushAndSave() {
         lock.lock()
+        flushScheduled = false
         let batch = buffer
         buffer.reset()
         lock.unlock()
 
+        #if DEBUG
+        print("[Tappy] DISK save: \(batch.keystrokes.count) keys, \(batch.leftClicks + batch.rightClicks + batch.middleClicks) clicks | trigger: threshold")
+        #endif
         Task { @MainActor [weak statsManager] in
             if !batch.isEmpty {
                 statsManager?.applyBatch(batch)
@@ -172,7 +172,7 @@ final class EventMonitor: @unchecked Sendable {
         }
     }
 
-    // Fast callback — appends to buffer only, no dictionary ops
+    // Fast callback — appends to buffer, per-app via dict keyed by currentAppName
     private static let eventCallback: CGEventTapCallBack = {
         (proxy, type, event, userInfo) -> Unmanaged<CGEvent>? in
 
@@ -192,16 +192,13 @@ final class EventMonitor: @unchecked Sendable {
         let now = Date().timeIntervalSince1970
         monitor.lock.lock()
 
-        // Tag batch with current app (cheap — just pointer copy when same app)
-        if monitor.buffer.appName == nil {
-            monitor.buffer.appName = monitor.currentAppName
-        }
+        let app = monitor.currentAppName
 
         switch type {
         case .keyDown:
             let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
             monitor.buffer.keystrokes.append((keyCode, now))
-            monitor.buffer.appKeystrokes += 1
+            monitor.buffer.appKeystrokes[app, default: 0] += 1
             monitor.eventsSinceLastSave += 1
         case .flagsChanged:
             let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
@@ -216,34 +213,41 @@ final class EventMonitor: @unchecked Sendable {
             }
             if isDown {
                 monitor.buffer.keystrokes.append((keyCode, now))
-                monitor.buffer.appKeystrokes += 1
+                monitor.buffer.appKeystrokes[app, default: 0] += 1
                 monitor.eventsSinceLastSave += 1
             }
         case .leftMouseDown:
             monitor.buffer.leftClicks += 1
-            monitor.buffer.appClicks += 1
+            monitor.buffer.appClicks[app, default: 0] += 1
             monitor.eventsSinceLastSave += 1
         case .rightMouseDown:
             monitor.buffer.rightClicks += 1
-            monitor.buffer.appClicks += 1
+            monitor.buffer.appClicks[app, default: 0] += 1
             monitor.eventsSinceLastSave += 1
         case .otherMouseDown:
             monitor.buffer.middleClicks += 1
-            monitor.buffer.appClicks += 1
+            monitor.buffer.appClicks[app, default: 0] += 1
             monitor.eventsSinceLastSave += 1
         default:
             break
         }
-
         let shouldSave = monitor.eventsSinceLastSave >= EventMonitor.saveThreshold
         if shouldSave {
             monitor.eventsSinceLastSave = 0
+        }
+        let needsFlush = monitor.isLive && !monitor.flushScheduled && !shouldSave
+        if needsFlush {
+            monitor.flushScheduled = true
         }
         monitor.lock.unlock()
 
         if shouldSave {
             DispatchQueue.main.async { [weak monitor] in
                 monitor?.flushAndSave()
+            }
+        } else if needsFlush {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak monitor] in
+                monitor?.flushToUI()
             }
         }
 
