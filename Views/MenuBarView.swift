@@ -176,7 +176,7 @@ struct MenuBarView: View {
             Label("Uptime", systemImage: "clock")
                 .font(.headline)
             StatRow(label: "System", value: stats.systemUptime)
-            StatRow(label: "Session", value: stats.sessionDuration)
+            StatRow(label: "Session", value: stats.totalActiveTimeFormatted)
         }
     }
 

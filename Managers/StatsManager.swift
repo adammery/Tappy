@@ -8,23 +8,8 @@ struct ExportData: Codable {
     var keyboard: KeyboardStats
     var mouse: MouseStats
     var perApp: [String: AppStats]
+    var totalActiveTime: TimeInterval
     var exportedAt: Date
-
-    // Backwards-compatible decode: perApp may not exist in old backups
-    init(keyboard: KeyboardStats, mouse: MouseStats, perApp: [String: AppStats] = [:], exportedAt: Date) {
-        self.keyboard = keyboard
-        self.mouse = mouse
-        self.perApp = perApp
-        self.exportedAt = exportedAt
-    }
-
-    init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        keyboard = try c.decode(KeyboardStats.self, forKey: .keyboard)
-        mouse = try c.decode(MouseStats.self, forKey: .mouse)
-        perApp = (try? c.decode([String: AppStats].self, forKey: .perApp)) ?? [:]
-        exportedAt = try c.decode(Date.self, forKey: .exportedAt)
-    }
 }
 
 private enum Crypto {
@@ -49,6 +34,7 @@ final class StatsManager {
     var keyboard = KeyboardStats()
     var mouse = MouseStats()
     var perApp: [String: AppStats] = [:]
+    var totalActiveTime: TimeInterval = 0
     var sessionStart = Date()
     var tick: Bool = false
 
@@ -56,6 +42,7 @@ final class StatsManager {
     private static let keyboardKey = "Tappy.keyboard"
     private static let mouseKey = "Tappy.mouse"
     private static let perAppKey = "Tappy.perApp"
+    private static let activeTimeKey = "Tappy.totalActiveTime"
 
     init() {
         loadStats()
@@ -100,9 +87,14 @@ final class StatsManager {
            let decoded = try? JSONDecoder().decode([String: AppStats].self, from: data) {
             perApp = decoded
         }
+        totalActiveTime = defaults.double(forKey: Self.activeTimeKey)
     }
 
     func save() {
+        let now = Date()
+        totalActiveTime += now.timeIntervalSince(sessionStart)
+        sessionStart = now
+
         if let data = try? JSONEncoder().encode(keyboard) {
             defaults.set(data, forKey: Self.keyboardKey)
         }
@@ -112,12 +104,14 @@ final class StatsManager {
         if let data = try? JSONEncoder().encode(perApp) {
             defaults.set(data, forKey: Self.perAppKey)
         }
+        defaults.set(totalActiveTime, forKey: Self.activeTimeKey)
     }
 
     func resetStats() {
         keyboard = KeyboardStats()
         mouse = MouseStats()
         perApp = [:]
+        totalActiveTime = 0
         sessionStart = Date()
         save()
     }
@@ -132,7 +126,7 @@ final class StatsManager {
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
 
-        let export = ExportData(keyboard: keyboard, mouse: mouse, perApp: perApp, exportedAt: Date())
+        let export = ExportData(keyboard: keyboard, mouse: mouse, perApp: perApp, totalActiveTime: totalActiveTime + Date().timeIntervalSince(sessionStart), exportedAt: Date())
         guard let json = try? JSONEncoder().encode(export),
               let encrypted = try? Crypto.encrypt(json) else { return }
         try? encrypted.write(to: url)
@@ -151,6 +145,8 @@ final class StatsManager {
         keyboard = imported.keyboard
         mouse = imported.mouse
         perApp = imported.perApp
+        totalActiveTime = imported.totalActiveTime
+        sessionStart = Date()
         save()
     }
 
@@ -165,11 +161,11 @@ final class StatsManager {
         return "\(minutes)m"
     }
 
-    var sessionDuration: String {
+    var totalActiveTimeFormatted: String {
         _ = tick
-        let elapsed = Date().timeIntervalSince(sessionStart)
-        let hours = Int(elapsed) / 3600
-        let minutes = (Int(elapsed) % 3600) / 60
+        let total = totalActiveTime + Date().timeIntervalSince(sessionStart)
+        let hours = Int(total) / 3600
+        let minutes = (Int(total) % 3600) / 60
         if hours > 0 { return "\(hours)h \(minutes)m" }
         return "\(minutes)m"
     }
