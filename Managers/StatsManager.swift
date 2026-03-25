@@ -35,7 +35,7 @@ final class StatsManager {
     var mouse = MouseStats()
     var perApp: [String: AppStats] = [:]
     var totalActiveTime: TimeInterval = 0
-    var sessionStart = Date()
+    private var uptimeAtLastSave = ProcessInfo.processInfo.systemUptime
     var tick: Bool = false
 
     private let defaults = UserDefaults.standard
@@ -91,9 +91,9 @@ final class StatsManager {
     }
 
     func save() {
-        let now = Date()
-        totalActiveTime += now.timeIntervalSince(sessionStart)
-        sessionStart = now
+        let now = ProcessInfo.processInfo.systemUptime
+        totalActiveTime += now - uptimeAtLastSave
+        uptimeAtLastSave = now
 
         if let data = try? JSONEncoder().encode(keyboard) {
             defaults.set(data, forKey: Self.keyboardKey)
@@ -112,7 +112,7 @@ final class StatsManager {
         mouse = MouseStats()
         perApp = [:]
         totalActiveTime = 0
-        sessionStart = Date()
+        uptimeAtLastSave = ProcessInfo.processInfo.systemUptime
         save()
     }
 
@@ -126,7 +126,7 @@ final class StatsManager {
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
 
-        let export = ExportData(keyboard: keyboard, mouse: mouse, perApp: perApp, totalActiveTime: totalActiveTime + Date().timeIntervalSince(sessionStart), exportedAt: Date())
+        let export = ExportData(keyboard: keyboard, mouse: mouse, perApp: perApp, totalActiveTime: totalActiveTime + ProcessInfo.processInfo.systemUptime - uptimeAtLastSave, exportedAt: Date())
         guard let json = try? JSONEncoder().encode(export),
               let encrypted = try? Crypto.encrypt(json) else { return }
         try? encrypted.write(to: url)
@@ -146,7 +146,7 @@ final class StatsManager {
         mouse = imported.mouse
         perApp = imported.perApp
         totalActiveTime = imported.totalActiveTime
-        sessionStart = Date()
+        uptimeAtLastSave = ProcessInfo.processInfo.systemUptime
         save()
     }
 
@@ -163,7 +163,7 @@ final class StatsManager {
 
     var totalActiveTimeFormatted: String {
         _ = tick
-        let total = totalActiveTime + Date().timeIntervalSince(sessionStart)
+        let total = totalActiveTime + ProcessInfo.processInfo.systemUptime - uptimeAtLastSave
         let hours = Int(total) / 3600
         let minutes = (Int(total) % 3600) / 60
         if hours > 0 { return "\(hours)h \(minutes)m" }

@@ -115,7 +115,7 @@ final class EventMonitor: @unchecked Sendable {
         lock.lock()
         isLive = live
         lock.unlock()
-        flushToUI()
+        if live { flushToUI() }
     }
 
     func stop() {
