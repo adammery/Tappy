@@ -17,7 +17,7 @@ struct MenuBarView: View {
                 totalView
                 Divider()
                 keyboardSection
-                if !stats.perApp.isEmpty {
+                if !stats.topApps.isEmpty {
                     Divider()
                     perAppSection
                 }
@@ -102,9 +102,8 @@ struct MenuBarView: View {
     }
 
     private var perAppSection: some View {
-        let sorted = stats.perApp.sorted { $0.value.totalInputs > $1.value.totalInputs }
-        let top5 = Array(sorted.prefix(5))
-        let maxInputs = top5.first?.value.totalInputs ?? 1
+        let top5 = stats.topApps
+        let maxInputs = top5.first?.stats.totalInputs ?? 1
         let totalAll = stats.perApp.values.reduce(0) { $0 + $1.totalInputs }
 
         return VStack(alignment: .leading, spacing: 6) {
@@ -126,13 +125,13 @@ struct MenuBarView: View {
 
             // Always show #1
             if let first = top5.first {
-                appRow(index: 1, name: first.key, inputs: first.value.totalInputs, maxInputs: maxInputs, totalAll: totalAll)
+                appRow(index: 1, name: first.name, inputs: first.stats.totalInputs, maxInputs: maxInputs, totalAll: totalAll)
             }
 
             // Expanded: show #2-5
             if showAllApps {
-                ForEach(Array(top5.dropFirst().enumerated()), id: \.element.key) { i, entry in
-                    appRow(index: i + 2, name: entry.key, inputs: entry.value.totalInputs, maxInputs: maxInputs, totalAll: totalAll)
+                ForEach(Array(top5.dropFirst().enumerated()), id: \.element.name) { i, entry in
+                    appRow(index: i + 2, name: entry.name, inputs: entry.stats.totalInputs, maxInputs: maxInputs, totalAll: totalAll)
                 }
             }
         }

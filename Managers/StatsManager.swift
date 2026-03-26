@@ -34,6 +34,7 @@ final class StatsManager {
     var keyboard = KeyboardStats()
     var mouse = MouseStats()
     var perApp: [String: AppStats] = [:]
+    var topApps: [(name: String, stats: AppStats)] = []
     var totalActiveTime: TimeInterval = 0
     private var uptimeAtLastSave = ProcessInfo.processInfo.systemUptime
     var tick: Bool = false
@@ -69,6 +70,8 @@ final class StatsManager {
         }
 
         keyboard.trimTimestamps()
+        topApps = perApp.sorted { $0.value.totalInputs > $1.value.totalInputs }
+            .prefix(5).map { ($0.key, $0.value) }
         tick.toggle()
     }
 
@@ -111,6 +114,7 @@ final class StatsManager {
         keyboard = KeyboardStats()
         mouse = MouseStats()
         perApp = [:]
+        topApps = []
         totalActiveTime = 0
         uptimeAtLastSave = ProcessInfo.processInfo.systemUptime
         save()

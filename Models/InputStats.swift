@@ -4,16 +4,15 @@ struct KeyboardStats: Codable, Sendable {
     var totalKeystrokes: Int = 0
     var keyFrequency: [UInt16: Int] = [:]
     var recentTimestamps: [TimeInterval] = []
-
-    var typingSpeed: Double {
-        let now = Date().timeIntervalSince1970
-        let recent = recentTimestamps.filter { now - $0 < 60.0 }
-        return Double(recent.count)
-    }
+    var typingSpeed: Double = 0
 
     mutating func trimTimestamps() {
         let now = Date().timeIntervalSince1970
         recentTimestamps.removeAll { now - $0 > 60.0 }
+        if recentTimestamps.count > 1000 {
+            recentTimestamps.removeFirst(recentTimestamps.count - 1000)
+        }
+        typingSpeed = Double(recentTimestamps.count)
     }
 
     // Don't persist recentTimestamps — they're ephemeral
