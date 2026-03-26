@@ -38,12 +38,15 @@ final class EventMonitor: @unchecked Sendable {
     private var eventsSinceLastSave: Int = 0
     private var isLive: Bool = false
     private var flushScheduled: Bool = false
-    private var saveTimer: Timer?
-
+    private var deferredSave: DispatchWorkItem?
     private static let saveThreshold = 200
 
     init(statsManager: StatsManager) {
         self.statsManager = statsManager
+    }
+
+    deinit {
+        NSWorkspace.shared.notificationCenter.removeObserver(self)
     }
 
     func start() {
@@ -94,9 +97,6 @@ final class EventMonitor: @unchecked Sendable {
         monitorThread?.name = "Tappy.EventMonitor"
         monitorThread?.start()
 
-        saveTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
-            self?.flushAndSave()
-        }
     }
 
     @objc private func appDidActivate(_ notification: Notification) {
@@ -119,8 +119,6 @@ final class EventMonitor: @unchecked Sendable {
     }
 
     func stop() {
-        saveTimer?.invalidate()
-        saveTimer = nil
         lock.lock()
         isLive = false
         flushScheduled = false
@@ -242,10 +240,21 @@ final class EventMonitor: @unchecked Sendable {
         monitor.lock.unlock()
 
         if shouldSave {
+            monitor.deferredSave?.cancel()
+            monitor.deferredSave = nil
             DispatchQueue.main.async { [weak monitor] in
                 monitor?.flushAndSave()
             }
-        } else if needsFlush {
+        } else {
+            monitor.deferredSave?.cancel()
+            let work = DispatchWorkItem { [weak monitor] in
+                monitor?.flushAndSave()
+            }
+            monitor.deferredSave = work
+            DispatchQueue.main.asyncAfter(deadline: .now() + 60, execute: work)
+        }
+
+        if needsFlush {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak monitor] in
                 monitor?.flushToUI()
             }
