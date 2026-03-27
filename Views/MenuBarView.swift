@@ -30,7 +30,7 @@ struct MenuBarView: View {
             }
         }
         .padding(12)
-        .frame(width: 310)
+        .frame(width: permission.hasPermission ? 310 : 220)
         .task {
             permission.checkPermission()
             if permission.hasPermission {
@@ -185,26 +185,21 @@ struct MenuBarView: View {
                 .font(.system(size: 32))
                 .foregroundStyle(.secondary)
 
-            Text("Input Monitoring Required")
+            Text("Input Monitoring")
                 .font(.headline)
 
-            Text("Tappy needs permission to monitor keyboard and mouse events.")
+            Text("Allow Tappy to count your inputs.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
 
-            Text("Updating? Remove the old Tappy from Input Monitoring, restart and grant access again.")
-                .font(.system(size: 9))
-                .foregroundStyle(.orange)
-                .multilineTextAlignment(.center)
-
-            Button("Grant Permission") {
+            Button("Grant Access") {
                 permission.requestPermission()
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.regular)
 
-            Button("Open System Settings") {
+            Button("System Settings") {
                 permission.openSystemSettings()
             }
             .buttonStyle(.borderless)
