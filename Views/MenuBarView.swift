@@ -283,6 +283,7 @@ struct MenuBarView: View {
                 Spacer()
 
                 Button("Quit") {
+                    stats.syncTodayToHistory()
                     stats.save()
                     NSApplication.shared.terminate(nil)
                 }

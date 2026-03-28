@@ -219,18 +219,12 @@ final class StatsManager {
     }
 
     func save() {
-        checkDayChange()
         let now = ProcessInfo.processInfo.systemUptime
         let uptimeDelta = now - uptimeAtLastSave
         totalActiveTime += uptimeDelta
         sessionActiveTime += now - sessionUptimeBase
         sessionUptimeBase = now
         uptimeAtLastSave = now
-
-        // Keep dailyHistory in sync on every disk save
-        var snap = dailyCommitted
-        snap.merge(currentSessionSnapshot())
-        dailyHistory[currentDay] = snap
 
         if let data = try? JSONEncoder().encode(keyboard) {
             defaults.set(data, forKey: Self.keyboardKey)
