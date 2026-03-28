@@ -63,13 +63,20 @@ struct MenuBarView: View {
         .onChange(of: selectedTab) { _, tab in
             onLive?(tab != 2)
         }
-        .alert("Reset All Data?", isPresented: $showResetAlert) {
-            Button("Cancel", role: .cancel) {}
-            Button("Reset", role: .destructive) {
-                stats.resetStats()
+        .onChange(of: showResetAlert) { _, show in
+            guard show else { return }
+            showResetAlert = false
+            DispatchQueue.main.async {
+                let alert = NSAlert()
+                alert.messageText = "Reset All Data?"
+                alert.informativeText = "This will permanently delete all stats, history, and session data."
+                alert.alertStyle = .warning
+                alert.addButton(withTitle: "Cancel")
+                alert.addButton(withTitle: "Reset")
+                if alert.runModal() == .alertSecondButtonReturn {
+                    stats.resetStats()
+                }
             }
-        } message: {
-            Text("This will permanently delete all stats, history, and session data.")
         }
     }
 
