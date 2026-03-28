@@ -48,3 +48,14 @@ struct AppStats: Codable, Sendable {
     var clicks: Int = 0
     var totalInputs: Int { keystrokes + clicks }
 }
+
+struct DailySnapshot: Codable {
+    var keystrokes: Int = 0
+    var clicks: Int = 0
+    var activeSeconds: Int = 0
+    var keyFrequency: [UInt16: Int] = [:]
+    var leftClicks: Int = 0
+    var rightClicks: Int = 0
+    var middleClicks: Int = 0
+    var perApp: [String: AppStats] = [:]
+}
