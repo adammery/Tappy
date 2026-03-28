@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		66622D052F71C7B600E144F4 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 66622D042F71C7B600E144F4 /* README.md */; };
 		66622D062F71C7B600E144F4 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 66622D032F71C7B600E144F4 /* LICENSE */; };
+		66704B102F77BBB2002C8060 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66704B0F2F77BBB2002C8060 /* ActivityView.swift */; };
 		66E9B8D82F719AF50077F8F6 /* StatRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D52F719AF50077F8F6 /* StatRow.swift */; };
 		66E9B8DA2F719AF50077F8F6 /* EventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8C72F719AF50077F8F6 /* EventMonitor.swift */; };
 		66E9B8DB2F719AF50077F8F6 /* TappyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8CF2F719AF50077F8F6 /* TappyApp.swift */; };
@@ -25,6 +26,7 @@
 /* Begin PBXFileReference section */
 		66622D032F71C7B600E144F4 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		66622D042F71C7B600E144F4 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		66704B0F2F77BBB2002C8060 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		66E9B8B92F719ADB0077F8F6 /* Tappy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tappy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66E9B8C72F719AF50077F8F6 /* EventMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMonitor.swift; sourceTree = "<group>"; };
 		66E9B8C82F719AF50077F8F6 /* PermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManager.swift; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 		66E9B8D72F719AF50077F8F6 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				66704B0F2F77BBB2002C8060 /* ActivityView.swift */,
 				66E9B8D02F719AF50077F8F6 /* KeyboardHeatmapView.swift */,
 				66E9B8D22F719AF50077F8F6 /* MenuBarView.swift */,
 				66E9B8D32F719AF50077F8F6 /* MouseHeatmapView.swift */,
@@ -157,7 +160,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2630;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					66E9B8B82F719ADB0077F8F6 = {
 						CreatedOnToolsVersion = 26.3;
@@ -205,6 +208,7 @@
 				66E9B8DB2F719AF50077F8F6 /* TappyApp.swift in Sources */,
 				66E9B8DC2F719AF50077F8F6 /* UpdateChecker.swift in Sources */,
 				66E9B8DD2F719AF50077F8F6 /* PermissionManager.swift in Sources */,
+				66704B102F77BBB2002C8060 /* ActivityView.swift in Sources */,
 				66E9B8DE2F719AF50077F8F6 /* InputStats.swift in Sources */,
 				66E9B8E02F719AF50077F8F6 /* KeyboardHeatmapView.swift in Sources */,
 				66E9B8E12F719AF50077F8F6 /* MenuBarView.swift in Sources */,
@@ -251,6 +255,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -275,6 +280,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -314,6 +320,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -331,6 +338,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -345,6 +353,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -368,7 +377,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.3;
+				MARKETING_VERSION = 0.9.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.adammery.Tappy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -391,6 +400,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -414,7 +424,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.3;
+				MARKETING_VERSION = 0.9.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.adammery.Tappy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;

@@ -48,3 +48,28 @@ struct AppStats: Codable, Sendable {
     var clicks: Int = 0
     var totalInputs: Int { keystrokes + clicks }
 }
+
+struct DailySnapshot: Codable {
+    var keystrokes: Int = 0
+    var clicks: Int = 0
+    var activeSeconds: Int = 0
+    var keyFrequency: [UInt16: Int] = [:]
+    var leftClicks: Int = 0
+    var rightClicks: Int = 0
+    var middleClicks: Int = 0
+    var perApp: [String: AppStats] = [:]
+
+    mutating func merge(_ other: DailySnapshot) {
+        keystrokes += other.keystrokes
+        clicks += other.clicks
+        activeSeconds += other.activeSeconds
+        leftClicks += other.leftClicks
+        rightClicks += other.rightClicks
+        middleClicks += other.middleClicks
+        for (k, v) in other.keyFrequency { keyFrequency[k, default: 0] += v }
+        for (app, stats) in other.perApp {
+            perApp[app, default: AppStats()].keystrokes += stats.keystrokes
+            perApp[app, default: AppStats()].clicks += stats.clicks
+        }
+    }
+}
