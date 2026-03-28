@@ -8,23 +8,49 @@ struct MenuBarView: View {
     var onLive: ((Bool) -> Void)?
     @State private var showOptions = false
     @State private var showAllApps = false
+    @State private var selectedTab = 0
+    @State private var historySnapshot: [String: DailySnapshot] = [:]
+    @State private var showToday = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if !permission.hasPermission {
                 permissionView
             } else {
-                totalView
-                Divider()
-                keyboardSection
-                if !stats.topApps.isEmpty {
-                    Divider()
-                    perAppSection
+                HStack(spacing: 0) {
+                    tabButton("Stats", tag: 0)
+                    tabButton("Activity", tag: 1)
                 }
-                Divider()
-                mouseSection
-                Divider()
-                uptimeSection
+                .background(RoundedRectangle(cornerRadius: 6).fill(.primary.opacity(0.06)))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                if selectedTab == 0 {
+                    HStack(spacing: 0) {
+                        todayAllTimeButton("Today", isSelected: showToday) {
+                            showToday = true
+                        }
+                        todayAllTimeButton("All Time", isSelected: !showToday) {
+                            showToday = false
+                        }
+                    }
+                    .background(RoundedRectangle(cornerRadius: 5).fill(.primary.opacity(0.06)))
+                    .clipShape(RoundedRectangle(cornerRadius: 5))
+
+                    totalView
+                    Divider()
+                    keyboardSection
+                    if !currentTopApps.isEmpty {
+                        Divider()
+                        perAppSection
+                    }
+                    Divider()
+                    mouseSection
+                    Divider()
+                    uptimeSection
+                } else {
+                    ActivityView(history: historySnapshot)
+                }
+
                 Divider()
                 footerView
             }
@@ -38,17 +64,26 @@ struct MenuBarView: View {
                 onLive?(true)
             }
         }
-        .onAppear { onLive?(true) }
+        .onAppear {
+            onLive?(true)
+            stats.syncTodayToHistory()
+            historySnapshot = stats.dailyHistory
+        }
         .onDisappear { onLive?(false) }
+        .onChange(of: selectedTab) { _, tab in
+            onLive?(tab == 0)
+        }
     }
 
     private var totalView: some View {
-        let total = stats.keyboard.totalKeystrokes + stats.mouse.totalClicks
+        let kb = currentKeyboard
+        let ms = currentMouse
+        let total = kb.totalKeystrokes + ms.totalClicks
         return HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(total.compact)
                     .font(.system(size: 22, weight: .bold, design: .rounded))
-                Text("Total Inputs")
+                Text(showToday ? "Today's Inputs" : "Total Inputs")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -60,7 +95,7 @@ struct MenuBarView: View {
                     Image(systemName: "keyboard")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text(stats.keyboard.totalKeystrokes.compact)
+                    Text(kb.totalKeystrokes.compact)
                         .font(.callout.weight(.semibold))
                         .fontDesign(.monospaced)
                 }
@@ -68,7 +103,7 @@ struct MenuBarView: View {
                     Image(systemName: "computermouse")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text(stats.mouse.totalClicks.compact)
+                    Text(ms.totalClicks.compact)
                         .font(.callout.weight(.semibold))
                         .fontDesign(.monospaced)
                 }
@@ -77,34 +112,37 @@ struct MenuBarView: View {
     }
 
     private var keyboardSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        let kb = currentKeyboard
+        return VStack(alignment: .leading, spacing: 6) {
             Label("Keyboard", systemImage: "keyboard")
                 .font(.headline)
-            StatRow(label: "Keystrokes", value: stats.keyboard.totalKeystrokes.compact)
-            StatRow(label: "Speed", value: "\(Int(stats.keyboard.typingSpeed)) keys/min")
-            KeyboardHeatmapView(keyFrequency: stats.keyboard.keyFrequency)
+            StatRow(label: "Keystrokes", value: kb.totalKeystrokes.compact)
+            StatRow(label: "Speed", value: "\(Int(kb.typingSpeed)) keys/min")
+            KeyboardHeatmapView(keyFrequency: kb.keyFrequency)
                 .padding(.top, 2)
         }
     }
 
     private var mouseSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        let ms = currentMouse
+        return VStack(alignment: .leading, spacing: 6) {
             Label("Mouse", systemImage: "computermouse")
                 .font(.headline)
-            StatRow(label: "Total Clicks", value: stats.mouse.totalClicks.compact)
+            StatRow(label: "Total Clicks", value: ms.totalClicks.compact)
             MouseHeatmapView(
-                leftClicks: stats.mouse.leftClicks,
-                rightClicks: stats.mouse.rightClicks,
-                middleClicks: stats.mouse.middleClicks
+                leftClicks: ms.leftClicks,
+                rightClicks: ms.rightClicks,
+                middleClicks: ms.middleClicks
             )
             .padding(.top, 2)
         }
     }
 
     private var perAppSection: some View {
-        let top5 = stats.topApps
+        let top5 = currentTopApps
+        let perAppData = showToday ? stats.todayPerApp : stats.perApp
         let maxInputs = top5.first?.stats.totalInputs ?? 1
-        let totalAll = stats.perApp.values.reduce(0) { $0 + $1.totalInputs }
+        let totalAll = perAppData.values.reduce(0) { $0 + $1.totalInputs }
 
         return VStack(alignment: .leading, spacing: 6) {
             Button {
@@ -175,7 +213,7 @@ struct MenuBarView: View {
             Label("Uptime", systemImage: "clock")
                 .font(.headline)
             StatRow(label: "System", value: stats.systemUptime)
-            StatRow(label: "Session", value: stats.totalActiveTimeFormatted)
+            StatRow(label: showToday ? "Today" : "Session", value: showToday ? stats.todayActiveTimeFormatted : stats.totalActiveTimeFormatted)
         }
     }
 
@@ -339,5 +377,51 @@ struct MenuBarView: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(.primary.opacity(0.04))
         )
+    }
+
+    private var currentKeyboard: KeyboardStats {
+        showToday ? stats.todayKeyboard : stats.keyboard
+    }
+
+    private var currentMouse: MouseStats {
+        showToday ? stats.todayMouse : stats.mouse
+    }
+
+    private var currentTopApps: [(name: String, stats: AppStats)] {
+        showToday ? stats.todayTopApps : stats.topApps
+    }
+
+    private func todayAllTimeButton(_ title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 4)
+                .background(
+                    isSelected
+                        ? RoundedRectangle(cornerRadius: 4).fill(Color.orange.opacity(0.8))
+                        : RoundedRectangle(cornerRadius: 4).fill(Color.clear)
+                )
+                .foregroundStyle(isSelected ? .white : .secondary)
+        }
+        .buttonStyle(.borderless)
+    }
+
+    private func tabButton(_ title: String, tag: Int) -> some View {
+        Button {
+            selectedTab = tag
+        } label: {
+            Text(title)
+                .font(.caption.weight(selectedTab == tag ? .semibold : .regular))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6)
+                .background(
+                    selectedTab == tag
+                        ? RoundedRectangle(cornerRadius: 5).fill(Color.orange.opacity(0.8))
+                        : RoundedRectangle(cornerRadius: 5).fill(Color.clear)
+                )
+                .foregroundStyle(selectedTab == tag ? .white : .secondary)
+        }
+        .buttonStyle(.borderless)
     }
 }
