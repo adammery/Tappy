@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		66622D052F71C7B600E144F4 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 66622D042F71C7B600E144F4 /* README.md */; };
 		66622D062F71C7B600E144F4 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 66622D032F71C7B600E144F4 /* LICENSE */; };
+		66704B102F77BBB2002C8060 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66704B0F2F77BBB2002C8060 /* ActivityView.swift */; };
 		66E9B8D82F719AF50077F8F6 /* StatRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8D52F719AF50077F8F6 /* StatRow.swift */; };
 		66E9B8DA2F719AF50077F8F6 /* EventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8C72F719AF50077F8F6 /* EventMonitor.swift */; };
 		66E9B8DB2F719AF50077F8F6 /* TappyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E9B8CF2F719AF50077F8F6 /* TappyApp.swift */; };
@@ -25,6 +26,7 @@
 /* Begin PBXFileReference section */
 		66622D032F71C7B600E144F4 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		66622D042F71C7B600E144F4 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		66704B0F2F77BBB2002C8060 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		66E9B8B92F719ADB0077F8F6 /* Tappy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tappy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66E9B8C72F719AF50077F8F6 /* EventMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMonitor.swift; sourceTree = "<group>"; };
 		66E9B8C82F719AF50077F8F6 /* PermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManager.swift; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 		66E9B8D72F719AF50077F8F6 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				66704B0F2F77BBB2002C8060 /* ActivityView.swift */,
 				66E9B8D02F719AF50077F8F6 /* KeyboardHeatmapView.swift */,
 				66E9B8D22F719AF50077F8F6 /* MenuBarView.swift */,
 				66E9B8D32F719AF50077F8F6 /* MouseHeatmapView.swift */,
@@ -205,6 +208,7 @@
 				66E9B8DB2F719AF50077F8F6 /* TappyApp.swift in Sources */,
 				66E9B8DC2F719AF50077F8F6 /* UpdateChecker.swift in Sources */,
 				66E9B8DD2F719AF50077F8F6 /* PermissionManager.swift in Sources */,
+				66704B102F77BBB2002C8060 /* ActivityView.swift in Sources */,
 				66E9B8DE2F719AF50077F8F6 /* InputStats.swift in Sources */,
 				66E9B8E02F719AF50077F8F6 /* KeyboardHeatmapView.swift in Sources */,
 				66E9B8E12F719AF50077F8F6 /* MenuBarView.swift in Sources */,
