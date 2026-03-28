@@ -324,10 +324,7 @@ struct ActivityView: View {
     }
 
     private func formatSeconds(_ seconds: Int) -> String {
-        let h = seconds / 3600
-        let m = (seconds % 3600) / 60
-        if h > 0 { return "\(h)h \(m)m" }
-        return "\(m)m"
+        seconds.formattedTime
     }
 
     // MARK: - Formatters

@@ -149,6 +149,7 @@ final class StatsManager {
     }
 
     func resetSession() {
+        syncTodayToHistory()
         dailyCommitted.merge(currentSessionSnapshot())
         sessionKeyboard = KeyboardStats()
         sessionMouse = MouseStats()
@@ -218,12 +219,18 @@ final class StatsManager {
     }
 
     func save() {
+        checkDayChange()
         let now = ProcessInfo.processInfo.systemUptime
         let uptimeDelta = now - uptimeAtLastSave
         totalActiveTime += uptimeDelta
         sessionActiveTime += now - sessionUptimeBase
         sessionUptimeBase = now
         uptimeAtLastSave = now
+
+        // Keep dailyHistory in sync on every disk save
+        var snap = dailyCommitted
+        snap.merge(currentSessionSnapshot())
+        dailyHistory[currentDay] = snap
 
         if let data = try? JSONEncoder().encode(keyboard) {
             defaults.set(data, forKey: Self.keyboardKey)
@@ -314,28 +321,21 @@ final class StatsManager {
 
     // MARK: - Uptime
 
-    private static func formatTime(_ seconds: Int) -> String {
-        let h = seconds / 3600
-        let m = (seconds % 3600) / 60
-        if h > 0 { return "\(h)h \(m)m" }
-        return "\(m)m"
-    }
-
     var systemUptime: String {
         _ = tick
-        return Self.formatTime(Int(ProcessInfo.processInfo.systemUptime))
+        return Int(ProcessInfo.processInfo.systemUptime).formattedTime
     }
 
     var totalActiveTimeFormatted: String {
         _ = tick
         let total = totalActiveTime + ProcessInfo.processInfo.systemUptime - uptimeAtLastSave
-        return Self.formatTime(Int(total))
+        return Int(total).formattedTime
     }
 
     var sessionActiveTimeFormatted: String {
         _ = tick
         let total = sessionActiveTime + ProcessInfo.processInfo.systemUptime - sessionUptimeBase
-        return Self.formatTime(Int(total))
+        return Int(total).formattedTime
     }
 
 }
