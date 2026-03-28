@@ -9,6 +9,7 @@ enum ActivityFilter: String, CaseIterable {
 struct ActivityView: View {
     let history: [String: DailySnapshot]
     @State private var filter: ActivityFilter = .daily
+    @State private var selectedIndex: Int?
 
     private struct BarData {
         var label: String
@@ -79,9 +80,13 @@ struct ActivityView: View {
         }
     }
 
-    /// Aggregated data for the entire selected period
-    private var periodData: BarData {
-        bars.reduce(into: BarData(label: "")) { result, bar in
+    /// Data for display — either selected bar or full period aggregate
+    private var displayData: BarData {
+        let allBars = bars
+        if let idx = selectedIndex, allBars.indices.contains(idx) {
+            return allBars[idx]
+        }
+        return allBars.reduce(into: BarData(label: "")) { result, bar in
             result.keys += bar.keys
             result.clicks += bar.clicks
             result.active += bar.active
@@ -104,11 +109,12 @@ struct ActivityView: View {
                 ForEach(ActivityFilter.allCases, id: \.self) { f in
                     Button {
                         filter = f
+                        selectedIndex = nil
                     } label: {
                         Text(f.rawValue)
                             .font(.caption.weight(filter == f ? .semibold : .regular))
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 5)
+                            .padding(.vertical, 3)
                             .background(
                                 filter == f
                                     ? RoundedRectangle(cornerRadius: 5).fill(Color.orange.opacity(0.8))
@@ -131,7 +137,7 @@ struct ActivityView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Label("Keyboard", systemImage: "keyboard")
                     .font(.headline)
-                KeyboardHeatmapView(keyFrequency: periodData.keyFrequency)
+                KeyboardHeatmapView(keyFrequency: displayData.keyFrequency)
             }
 
             Divider()
@@ -140,13 +146,13 @@ struct ActivityView: View {
                 Label("Mouse", systemImage: "computermouse")
                     .font(.headline)
                 MouseHeatmapView(
-                    leftClicks: periodData.leftClicks,
-                    rightClicks: periodData.rightClicks,
-                    middleClicks: periodData.middleClicks
+                    leftClicks: displayData.leftClicks,
+                    rightClicks: displayData.rightClicks,
+                    middleClicks: displayData.middleClicks
                 )
             }
 
-            if !periodData.perApp.isEmpty {
+            if !displayData.perApp.isEmpty {
                 Divider()
                 appsSection
             }
@@ -158,41 +164,66 @@ struct ActivityView: View {
         let maxVal = data.map { $0.keys + $0.clicks }.max() ?? 1
 
         return VStack(spacing: 4) {
-            Canvas { context, size in
-                let barCount = CGFloat(data.count)
-                let spacing: CGFloat = 4
-                let barWidth = (size.width - spacing * (barCount - 1)) / barCount
-                let maxHeight = size.height
+            ZStack {
+                Canvas { context, size in
+                    let barCount = CGFloat(data.count)
+                    let spacing: CGFloat = 4
+                    let barWidth = (size.width - spacing * (barCount - 1)) / barCount
+                    let maxHeight = size.height
 
-                for (i, bar) in data.enumerated() {
-                    let total = bar.keys + bar.clicks
-                    let ratio = maxVal > 0 ? CGFloat(total) / CGFloat(maxVal) : 0
-                    let height = maxHeight * ratio
-                    let x = CGFloat(i) * (barWidth + spacing)
-                    let y = maxHeight - height
+                    for (i, bar) in data.enumerated() {
+                        let total = bar.keys + bar.clicks
+                        let ratio = maxVal > 0 ? CGFloat(total) / CGFloat(maxVal) : 0
+                        let height = maxHeight * ratio
+                        let x = CGFloat(i) * (barWidth + spacing)
+                        let y = maxHeight - height
+                        let isSelected = selectedIndex == i
 
-                    let rect = CGRect(x: x, y: y, width: barWidth, height: height)
-                    let path = Path(roundedRect: rect, cornerRadius: 3)
-                    context.fill(path, with: .color(.orange.opacity(0.3 + ratio * 0.5)))
+                        let rect = CGRect(x: x, y: y, width: barWidth, height: height)
+                        let path = Path(roundedRect: rect, cornerRadius: 3)
+                        let opacity = isSelected ? 0.9 : (0.3 + ratio * 0.5)
+                        context.fill(path, with: .color(.orange.opacity(opacity)))
 
-                    // Clicks portion at bottom
-                    if bar.clicks > 0 && total > 0 {
-                        let clickRatio = CGFloat(bar.clicks) / CGFloat(total)
-                        let clickHeight = height * clickRatio
-                        let clickRect = CGRect(x: x, y: maxHeight - clickHeight, width: barWidth, height: clickHeight)
-                        let clickPath = Path(roundedRect: clickRect, cornerRadius: 2)
-                        context.fill(clickPath, with: .color(.blue.opacity(0.25)))
+                        // Clicks portion at bottom
+                        if bar.clicks > 0 && total > 0 {
+                            let clickRatio = CGFloat(bar.clicks) / CGFloat(total)
+                            let clickHeight = height * clickRatio
+                            let clickRect = CGRect(x: x, y: maxHeight - clickHeight, width: barWidth, height: clickHeight)
+                            let clickPath = Path(roundedRect: clickRect, cornerRadius: 2)
+                            context.fill(clickPath, with: .color(.blue.opacity(isSelected ? 0.4 : 0.25)))
+                        }
+
+                        // Selection indicator — dot under bar
+                        if isSelected {
+                            let dotSize: CGFloat = 4
+                            let dotRect = CGRect(x: x + barWidth / 2 - dotSize / 2, y: maxHeight - dotSize - 1, width: dotSize, height: dotSize)
+                            context.fill(Path(ellipseIn: dotRect), with: .color(.orange))
+                        }
                     }
                 }
+                .frame(height: 80)
+
+                // Tap targets
+                HStack(spacing: 4) {
+                    ForEach(0..<data.count, id: \.self) { i in
+                        Color.clear
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                withAnimation(.easeInOut(duration: 0.15)) {
+                                    selectedIndex = selectedIndex == i ? nil : i
+                                }
+                            }
+                    }
+                }
+                .frame(height: 80)
             }
-            .frame(height: 80)
 
             // Labels
             HStack(spacing: 0) {
-                ForEach(Array(data.enumerated()), id: \.offset) { _, bar in
+                ForEach(Array(data.enumerated()), id: \.offset) { i, bar in
                     Text(bar.label)
-                        .font(.system(size: 8))
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 8, weight: selectedIndex == i ? .bold : .regular))
+                        .foregroundStyle(selectedIndex == i ? .orange : .secondary)
                         .frame(maxWidth: .infinity)
                 }
             }
@@ -200,7 +231,7 @@ struct ActivityView: View {
     }
 
     private var summaryView: some View {
-        let p = periodData
+        let p = displayData
         let totalInputs = p.keys + p.clicks
 
         return VStack(spacing: 6) {
@@ -231,9 +262,9 @@ struct ActivityView: View {
     }
 
     private var appsSection: some View {
-        let sorted = periodData.perApp.sorted { $0.value.totalInputs > $1.value.totalInputs }.prefix(5)
+        let sorted = displayData.perApp.sorted { $0.value.totalInputs > $1.value.totalInputs }.prefix(5)
         let maxInputs = sorted.first?.value.totalInputs ?? 1
-        let totalAll = periodData.perApp.values.reduce(0) { $0 + $1.totalInputs }
+        let totalAll = displayData.perApp.values.reduce(0) { $0 + $1.totalInputs }
 
         return VStack(alignment: .leading, spacing: 4) {
             Label("Apps", systemImage: "square.grid.2x2")

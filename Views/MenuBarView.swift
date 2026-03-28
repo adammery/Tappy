@@ -10,7 +10,7 @@ struct MenuBarView: View {
     @State private var showAllApps = false
     @State private var selectedTab = 0
     @State private var historySnapshot: [String: DailySnapshot] = [:]
-    @State private var showToday = false
+    @State private var showResetAlert = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -18,24 +18,14 @@ struct MenuBarView: View {
                 permissionView
             } else {
                 HStack(spacing: 0) {
-                    tabButton("Stats", tag: 0)
-                    tabButton("Activity", tag: 1)
+                    tabButton("Session", tag: 0)
+                    tabButton("All Time", tag: 1)
+                    tabButton("Activity", tag: 2)
                 }
                 .background(RoundedRectangle(cornerRadius: 6).fill(.primary.opacity(0.06)))
                 .clipShape(RoundedRectangle(cornerRadius: 6))
 
-                if selectedTab == 0 {
-                    HStack(spacing: 0) {
-                        todayAllTimeButton("Today", isSelected: showToday) {
-                            showToday = true
-                        }
-                        todayAllTimeButton("All Time", isSelected: !showToday) {
-                            showToday = false
-                        }
-                    }
-                    .background(RoundedRectangle(cornerRadius: 5).fill(.primary.opacity(0.06)))
-                    .clipShape(RoundedRectangle(cornerRadius: 5))
-
+                if selectedTab <= 1 {
                     totalView
                     Divider()
                     keyboardSection
@@ -47,7 +37,7 @@ struct MenuBarView: View {
                     mouseSection
                     Divider()
                     uptimeSection
-                } else {
+                } else if selectedTab == 2 {
                     ActivityView(history: historySnapshot)
                 }
 
@@ -71,7 +61,15 @@ struct MenuBarView: View {
         }
         .onDisappear { onLive?(false) }
         .onChange(of: selectedTab) { _, tab in
-            onLive?(tab == 0)
+            onLive?(tab != 2)
+        }
+        .alert("Reset All Data?", isPresented: $showResetAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Reset", role: .destructive) {
+                stats.resetStats()
+            }
+        } message: {
+            Text("This will permanently delete all stats, history, and session data.")
         }
     }
 
@@ -83,7 +81,7 @@ struct MenuBarView: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(total.compact)
                     .font(.system(size: 22, weight: .bold, design: .rounded))
-                Text(showToday ? "Today's Inputs" : "Total Inputs")
+                Text(isSession ? "Session Inputs" : "Total Inputs")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -140,7 +138,7 @@ struct MenuBarView: View {
 
     private var perAppSection: some View {
         let top5 = currentTopApps
-        let perAppData = showToday ? stats.todayPerApp : stats.perApp
+        let perAppData = isSession ? stats.sessionPerApp : stats.perApp
         let maxInputs = top5.first?.stats.totalInputs ?? 1
         let totalAll = perAppData.values.reduce(0) { $0 + $1.totalInputs }
 
@@ -209,12 +207,7 @@ struct MenuBarView: View {
     }
 
     private var uptimeSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Label("Uptime", systemImage: "clock")
-                .font(.headline)
-            StatRow(label: "System", value: stats.systemUptime)
-            StatRow(label: showToday ? "Today" : "Session", value: showToday ? stats.todayActiveTimeFormatted : stats.totalActiveTimeFormatted)
-        }
+        StatRow(label: "Active", value: isSession ? stats.sessionActiveTimeFormatted : stats.totalActiveTimeFormatted)
     }
 
     private var permissionView: some View {
@@ -359,13 +352,24 @@ struct MenuBarView: View {
 
             Divider()
 
-            // Reset
+            // Reset Session
             Button {
-                stats.resetStats()
+                stats.resetSession()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.counterclockwise")
+                    Text("Reset Session")
+                }
+            }
+            .buttonStyle(.borderless)
+
+            // Reset All
+            Button {
+                showResetAlert = true
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "trash")
-                    Text("Reset Stats")
+                    Text("Reset All Data")
                 }
                 .foregroundStyle(.red)
             }
@@ -379,32 +383,18 @@ struct MenuBarView: View {
         )
     }
 
+    private var isSession: Bool { selectedTab == 0 }
+
     private var currentKeyboard: KeyboardStats {
-        showToday ? stats.todayKeyboard : stats.keyboard
+        isSession ? stats.sessionKeyboard : stats.keyboard
     }
 
     private var currentMouse: MouseStats {
-        showToday ? stats.todayMouse : stats.mouse
+        isSession ? stats.sessionMouse : stats.mouse
     }
 
     private var currentTopApps: [(name: String, stats: AppStats)] {
-        showToday ? stats.todayTopApps : stats.topApps
-    }
-
-    private func todayAllTimeButton(_ title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 4)
-                .background(
-                    isSelected
-                        ? RoundedRectangle(cornerRadius: 4).fill(Color.orange.opacity(0.8))
-                        : RoundedRectangle(cornerRadius: 4).fill(Color.clear)
-                )
-                .foregroundStyle(isSelected ? .white : .secondary)
-        }
-        .buttonStyle(.borderless)
+        isSession ? stats.sessionTopApps : stats.topApps
     }
 
     private func tabButton(_ title: String, tag: Int) -> some View {
@@ -414,7 +404,7 @@ struct MenuBarView: View {
             Text(title)
                 .font(.caption.weight(selectedTab == tag ? .semibold : .regular))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
+                .padding(.vertical, 4)
                 .background(
                     selectedTab == tag
                         ? RoundedRectangle(cornerRadius: 5).fill(Color.orange.opacity(0.8))

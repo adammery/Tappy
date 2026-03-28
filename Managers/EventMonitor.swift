@@ -39,7 +39,7 @@ final class EventMonitor: @unchecked Sendable {
     private var isLive: Bool = false
     private var flushScheduled: Bool = false
     private var deferredSave: DispatchWorkItem?
-    private static let saveThreshold = 200
+    private static let saveThreshold = 250
 
     init(statsManager: StatsManager) {
         self.statsManager = statsManager
@@ -119,6 +119,8 @@ final class EventMonitor: @unchecked Sendable {
     }
 
     func stop() {
+        deferredSave?.cancel()
+        deferredSave = nil
         lock.lock()
         isLive = false
         flushScheduled = false

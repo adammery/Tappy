@@ -41,14 +41,15 @@ final class StatsManager {
     private var uptimeAtLastSave = ProcessInfo.processInfo.systemUptime
     var tick: Bool = false
 
-    // Today-only stats (reset on date change)
-    var todayKeyboard = KeyboardStats()
-    var todayMouse = MouseStats()
-    var todayPerApp: [String: AppStats] = [:]
-    var todayTopApps: [(name: String, stats: AppStats)] = []
-    var todayActiveTime: TimeInterval = 0
+    // Session stats (manual reset only)
+    var sessionKeyboard = KeyboardStats()
+    var sessionMouse = MouseStats()
+    var sessionPerApp: [String: AppStats] = [:]
+    var sessionTopApps: [(name: String, stats: AppStats)] = []
+    var sessionActiveTime: TimeInterval = 0
     private var currentDay: String = ""
-    private var todayUptimeBase = ProcessInfo.processInfo.systemUptime
+    private var sessionUptimeBase = ProcessInfo.processInfo.systemUptime
+    private var dailyCommitted = DailySnapshot()
 
     private let defaults = UserDefaults.standard
     private static let keyboardKey = "Tappy.keyboard"
@@ -56,10 +57,11 @@ final class StatsManager {
     private static let perAppKey = "Tappy.perApp"
     private static let activeTimeKey = "Tappy.totalActiveTime"
     private static let dailyHistoryKey = "Tappy.dailyHistory"
-    private static let todayKeyboardKey = "Tappy.todayKeyboard"
-    private static let todayMouseKey = "Tappy.todayMouse"
-    private static let todayPerAppKey = "Tappy.todayPerApp"
-    private static let todayActiveTimeKey = "Tappy.todayActiveTime"
+    private static let sessionKeyboardKey = "Tappy.sessionKeyboard"
+    private static let sessionMouseKey = "Tappy.sessionMouse"
+    private static let sessionPerAppKey = "Tappy.sessionPerApp"
+    private static let sessionActiveTimeKey = "Tappy.sessionActiveTime"
+    private static let dailyCommittedKey = "Tappy.dailyCommitted"
     private static let currentDayKey = "Tappy.currentDay"
 
     private static let dayFormatter: DateFormatter = {
@@ -73,23 +75,42 @@ final class StatsManager {
     init() {
         currentDay = todayKey
         loadStats()
-        topApps = perApp.sorted { $0.value.totalInputs > $1.value.totalInputs }
-            .prefix(5).map { ($0.key, $0.value) }
-        todayTopApps = todayPerApp.sorted { $0.value.totalInputs > $1.value.totalInputs }
-            .prefix(5).map { ($0.key, $0.value) }
+        updateTopApps()
     }
 
     // MARK: - Batch processing (called by EventMonitor flush)
 
     func applyBatch(_ batch: EventBatch) {
-        // Check for date change (midnight reset)
-        let today = todayKey
-        if today != currentDay {
-            resetToday()
-            currentDay = today
-        }
+        checkDayChange()
+        applyToStats(keyboard: &keyboard, mouse: &mouse, perApp: &perApp, batch: batch)
+        applyToStats(keyboard: &sessionKeyboard, mouse: &sessionMouse, perApp: &sessionPerApp, batch: batch)
+        keyboard.trimTimestamps()
+        sessionKeyboard.trimTimestamps()
+        updateTopApps()
+        tick.toggle()
+    }
 
-        // All-time stats
+    /// Detect midnight crossing — commit session to yesterday, start fresh
+    private func checkDayChange() {
+        let today = todayKey
+        guard today != currentDay else { return }
+        // Commit current session to old day
+        var snap = dailyCommitted
+        snap.merge(currentSessionSnapshot())
+        dailyHistory[currentDay] = snap
+        // Reset for new day
+        dailyCommitted = DailySnapshot()
+        sessionKeyboard = KeyboardStats()
+        sessionMouse = MouseStats()
+        sessionPerApp = [:]
+        sessionTopApps = []
+        sessionActiveTime = 0
+        sessionUptimeBase = ProcessInfo.processInfo.systemUptime
+        currentDay = today
+    }
+
+    private func applyToStats(keyboard: inout KeyboardStats, mouse: inout MouseStats,
+                              perApp: inout [String: AppStats], batch: EventBatch) {
         for (keyCode, timestamp) in batch.keystrokes {
             keyboard.totalKeystrokes += 1
             keyboard.keyFrequency[keyCode, default: 0] += 1
@@ -98,63 +119,53 @@ final class StatsManager {
         mouse.leftClicks += batch.leftClicks
         mouse.rightClicks += batch.rightClicks
         mouse.middleClicks += batch.middleClicks
-
         for (app, count) in batch.appKeystrokes {
             perApp[app, default: AppStats()].keystrokes += count
         }
         for (app, count) in batch.appClicks {
             perApp[app, default: AppStats()].clicks += count
         }
-
-        // Today stats (mirror of all-time logic)
-        for (keyCode, timestamp) in batch.keystrokes {
-            todayKeyboard.totalKeystrokes += 1
-            todayKeyboard.keyFrequency[keyCode, default: 0] += 1
-            todayKeyboard.recentTimestamps.append(timestamp)
-        }
-        todayMouse.leftClicks += batch.leftClicks
-        todayMouse.rightClicks += batch.rightClicks
-        todayMouse.middleClicks += batch.middleClicks
-
-        for (app, count) in batch.appKeystrokes {
-            todayPerApp[app, default: AppStats()].keystrokes += count
-        }
-        for (app, count) in batch.appClicks {
-            todayPerApp[app, default: AppStats()].clicks += count
-        }
-
-        keyboard.trimTimestamps()
-        todayKeyboard.trimTimestamps()
-        topApps = perApp.sorted { $0.value.totalInputs > $1.value.totalInputs }
-            .prefix(5).map { ($0.key, $0.value) }
-        todayTopApps = todayPerApp.sorted { $0.value.totalInputs > $1.value.totalInputs }
-            .prefix(5).map { ($0.key, $0.value) }
-        tick.toggle()
     }
 
-    private func resetToday() {
-        todayKeyboard = KeyboardStats()
-        todayMouse = MouseStats()
-        todayPerApp = [:]
-        todayTopApps = []
-        todayActiveTime = 0
-        todayUptimeBase = ProcessInfo.processInfo.systemUptime
+    private func updateTopApps() {
+        topApps = perApp.sorted { $0.value.totalInputs > $1.value.totalInputs }
+            .prefix(5).map { ($0.key, $0.value) }
+        sessionTopApps = sessionPerApp.sorted { $0.value.totalInputs > $1.value.totalInputs }
+            .prefix(5).map { ($0.key, $0.value) }
+    }
+
+    private func currentSessionSnapshot() -> DailySnapshot {
+        let activeNow = sessionActiveTime + ProcessInfo.processInfo.systemUptime - sessionUptimeBase
+        return DailySnapshot(
+            keystrokes: sessionKeyboard.totalKeystrokes,
+            clicks: sessionMouse.totalClicks,
+            activeSeconds: Int(activeNow),
+            keyFrequency: sessionKeyboard.keyFrequency,
+            leftClicks: sessionMouse.leftClicks,
+            rightClicks: sessionMouse.rightClicks,
+            middleClicks: sessionMouse.middleClicks,
+            perApp: sessionPerApp
+        )
+    }
+
+    func resetSession() {
+        dailyCommitted.merge(currentSessionSnapshot())
+        sessionKeyboard = KeyboardStats()
+        sessionMouse = MouseStats()
+        sessionPerApp = [:]
+        sessionTopApps = []
+        sessionActiveTime = 0
+        sessionUptimeBase = ProcessInfo.processInfo.systemUptime
+        save()
     }
 
     /// Sync today's live stats into dailyHistory — call before reading dailyHistory for Activity tab
     func syncTodayToHistory() {
+        checkDayChange()
         let today = todayKey
-        let activeNow = todayActiveTime + ProcessInfo.processInfo.systemUptime - todayUptimeBase
-        dailyHistory[today] = DailySnapshot(
-            keystrokes: todayKeyboard.totalKeystrokes,
-            clicks: todayMouse.totalClicks,
-            activeSeconds: Int(activeNow),
-            keyFrequency: todayKeyboard.keyFrequency,
-            leftClicks: todayMouse.leftClicks,
-            rightClicks: todayMouse.rightClicks,
-            middleClicks: todayMouse.middleClicks,
-            perApp: todayPerApp
-        )
+        var snap = dailyCommitted
+        snap.merge(currentSessionSnapshot())
+        dailyHistory[today] = snap
 
         // Drop entries older than 365 days
         let cutoff = Calendar.current.date(byAdding: .day, value: -365, to: Date())!
@@ -183,22 +194,26 @@ final class StatsManager {
             dailyHistory = decoded
         }
 
-        // Today stats — only load if saved day matches today
+        // Session + committed — only load if saved day matches today
         let savedDay = defaults.string(forKey: Self.currentDayKey) ?? ""
         if savedDay == todayKey {
-            if let data = defaults.data(forKey: Self.todayKeyboardKey),
+            if let data = defaults.data(forKey: Self.sessionKeyboardKey),
                let decoded = try? JSONDecoder().decode(KeyboardStats.self, from: data) {
-                todayKeyboard = decoded
+                sessionKeyboard = decoded
             }
-            if let data = defaults.data(forKey: Self.todayMouseKey),
+            if let data = defaults.data(forKey: Self.sessionMouseKey),
                let decoded = try? JSONDecoder().decode(MouseStats.self, from: data) {
-                todayMouse = decoded
+                sessionMouse = decoded
             }
-            if let data = defaults.data(forKey: Self.todayPerAppKey),
+            if let data = defaults.data(forKey: Self.sessionPerAppKey),
                let decoded = try? JSONDecoder().decode([String: AppStats].self, from: data) {
-                todayPerApp = decoded
+                sessionPerApp = decoded
             }
-            todayActiveTime = defaults.double(forKey: Self.todayActiveTimeKey)
+            sessionActiveTime = defaults.double(forKey: Self.sessionActiveTimeKey)
+            if let data = defaults.data(forKey: Self.dailyCommittedKey),
+               let decoded = try? JSONDecoder().decode(DailySnapshot.self, from: data) {
+                dailyCommitted = decoded
+            }
         }
     }
 
@@ -206,8 +221,8 @@ final class StatsManager {
         let now = ProcessInfo.processInfo.systemUptime
         let uptimeDelta = now - uptimeAtLastSave
         totalActiveTime += uptimeDelta
-        todayActiveTime += now - todayUptimeBase
-        todayUptimeBase = now
+        sessionActiveTime += now - sessionUptimeBase
+        sessionUptimeBase = now
         uptimeAtLastSave = now
 
         if let data = try? JSONEncoder().encode(keyboard) {
@@ -225,17 +240,20 @@ final class StatsManager {
             defaults.set(data, forKey: Self.dailyHistoryKey)
         }
 
-        // Today stats persistence
-        if let data = try? JSONEncoder().encode(todayKeyboard) {
-            defaults.set(data, forKey: Self.todayKeyboardKey)
+        // Session stats persistence
+        if let data = try? JSONEncoder().encode(sessionKeyboard) {
+            defaults.set(data, forKey: Self.sessionKeyboardKey)
         }
-        if let data = try? JSONEncoder().encode(todayMouse) {
-            defaults.set(data, forKey: Self.todayMouseKey)
+        if let data = try? JSONEncoder().encode(sessionMouse) {
+            defaults.set(data, forKey: Self.sessionMouseKey)
         }
-        if let data = try? JSONEncoder().encode(todayPerApp) {
-            defaults.set(data, forKey: Self.todayPerAppKey)
+        if let data = try? JSONEncoder().encode(sessionPerApp) {
+            defaults.set(data, forKey: Self.sessionPerAppKey)
         }
-        defaults.set(todayActiveTime, forKey: Self.todayActiveTimeKey)
+        defaults.set(sessionActiveTime, forKey: Self.sessionActiveTimeKey)
+        if let data = try? JSONEncoder().encode(dailyCommitted) {
+            defaults.set(data, forKey: Self.dailyCommittedKey)
+        }
         defaults.set(currentDay, forKey: Self.currentDayKey)
     }
 
@@ -247,7 +265,13 @@ final class StatsManager {
         totalActiveTime = 0
         dailyHistory = [:]
         uptimeAtLastSave = ProcessInfo.processInfo.systemUptime
-        resetToday()
+        sessionKeyboard = KeyboardStats()
+        sessionMouse = MouseStats()
+        sessionPerApp = [:]
+        sessionTopApps = []
+        sessionActiveTime = 0
+        sessionUptimeBase = ProcessInfo.processInfo.systemUptime
+        dailyCommitted = DailySnapshot()
         currentDay = todayKey
         save()
     }
@@ -284,35 +308,34 @@ final class StatsManager {
         totalActiveTime = imported.totalActiveTime
         dailyHistory = imported.dailyHistory ?? [:]
         uptimeAtLastSave = ProcessInfo.processInfo.systemUptime
+        updateTopApps()
         save()
     }
 
     // MARK: - Uptime
 
+    private static func formatTime(_ seconds: Int) -> String {
+        let h = seconds / 3600
+        let m = (seconds % 3600) / 60
+        if h > 0 { return "\(h)h \(m)m" }
+        return "\(m)m"
+    }
+
     var systemUptime: String {
         _ = tick
-        let uptime = ProcessInfo.processInfo.systemUptime
-        let hours = Int(uptime) / 3600
-        let minutes = (Int(uptime) % 3600) / 60
-        if hours > 0 { return "\(hours)h \(minutes)m" }
-        return "\(minutes)m"
+        return Self.formatTime(Int(ProcessInfo.processInfo.systemUptime))
     }
 
     var totalActiveTimeFormatted: String {
         _ = tick
         let total = totalActiveTime + ProcessInfo.processInfo.systemUptime - uptimeAtLastSave
-        let hours = Int(total) / 3600
-        let minutes = (Int(total) % 3600) / 60
-        if hours > 0 { return "\(hours)h \(minutes)m" }
-        return "\(minutes)m"
+        return Self.formatTime(Int(total))
     }
 
-    var todayActiveTimeFormatted: String {
+    var sessionActiveTimeFormatted: String {
         _ = tick
-        let total = todayActiveTime + ProcessInfo.processInfo.systemUptime - todayUptimeBase
-        let hours = Int(total) / 3600
-        let minutes = (Int(total) % 3600) / 60
-        if hours > 0 { return "\(hours)h \(minutes)m" }
-        return "\(minutes)m"
+        let total = sessionActiveTime + ProcessInfo.processInfo.systemUptime - sessionUptimeBase
+        return Self.formatTime(Int(total))
     }
+
 }
